@@ -26,5 +26,5 @@
   Cache-Control: public, max-age=604800
 
 # Preview deployments must never be indexed.
-https://:project.pages.dev/*
+https://:version.:project.pages.dev/*
   X-Robots-Tag: noindex

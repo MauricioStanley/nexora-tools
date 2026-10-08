@@ -62,7 +62,7 @@ The subdomain is independent from the main `codywork.com` site: separate project
 
 - Security: `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, `X-Frame-Options: DENY`, `Content-Security-Policy: frame-ancestors 'none'`, `COOP`, `HSTS`. The main CSP (script/style hashes) is emitted per page by Astro as a `<meta>` tag.
 - Caching: `/_astro/*` immutable for 1 year (fingerprinted), `/vendor/*` 30 days, `/search-index/*` 10 minutes with SWR, `/og/*` 7 days. HTML uses Cloudflare defaults (revalidated on deploy).
-- Previews: `X-Robots-Tag: noindex` for `*.pages.dev`.
+- Previews: `X-Robots-Tag: noindex` for preview deployments (`<hash>.<project>.pages.dev`). The production `<project>.pages.dev` stays indexable.
 
 Trailing slashes: Cloudflare Pages serves `dist/en/tools/index.html` at `/en/tools/` and redirects `/en/tools` → `/en/tools/`. All internal links already include the slash.
 
