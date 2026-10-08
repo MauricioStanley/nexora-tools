@@ -1,0 +1,111 @@
+---
+import type { Locale } from '@/config/site';
+import { getActivePlan } from '@/config/features';
+import { formatBytes, getDictionary, plural, fmt } from '@/i18n';
+import { FILE_TYPES, MB } from '@/lib/files/types';
+import type { Tool } from '@/tools/types';
+import Icon from '@/components/ui/Icon.astro';
+
+interface Props {
+  tool: Tool;
+  locale: Locale;
+}
+
+const { tool, locale } = Astro.props;
+const t = getDictionary(locale);
+const plan = getActivePlan();
+const input = tool.input;
+const accepts = input.accept.map((id) => FILE_TYPES[id].label).join(', ');
+const outputs = tool.output.map((id) => FILE_TYPES[id].label).join(', ');
+const maxSize = formatBytes(input.maxFileSizeMB * plan.fileSizeMultiplier * MB, locale);
+const maxFiles = Math.round(input.maxFiles * plan.fileCountMultiplier);
+---
+
+<aside class="facts" aria-labelledby="facts-title">
+  <h2 id="facts-title" class="facts__title">{t.toolPage.facts}</h2>
+  <dl class="facts__list">
+    {
+      input.kind === 'files' && (
+        <>
+          <div>
+            <dt>{t.toolPage.factsInput}</dt>
+            <dd>{accepts}</dd>
+          </div>
+          <div>
+            <dt>{t.toolPage.factsMaxSize}</dt>
+            <dd class="tabular">{fmt(t.toolPage.perFile, { size: maxSize })}</dd>
+          </div>
+          <div>
+            <dt>{t.toolPage.factsMaxFiles}</dt>
+            <dd class="tabular">{plural(t.toolPage.upToFiles, maxFiles, locale)}</dd>
+          </div>
+        </>
+      )
+    }
+    <div>
+      <dt>{t.toolPage.factsOutput}</dt>
+      <dd>{outputs}</dd>
+    </div>
+    <div>
+      <dt>{t.toolPage.factsProcessing}</dt>
+      <dd class:list={{ 'facts__local': tool.executionMode === 'client' }}>
+        {tool.executionMode === 'client' && <Icon name="shield" />}
+        {t.privacy[tool.executionMode].label}
+      </dd>
+    </div>
+    <div>
+      <dt>{t.toolPage.factsPrice}</dt>
+      <dd>{t.toolPage.factsPriceValue}</dd>
+    </div>
+  </dl>
+</aside>
+
+<style>
+  .facts {
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+  }
+
+  .facts__title {
+    margin-bottom: var(--space-4);
+    font-size: var(--text-base);
+  }
+
+  .facts__list {
+    display: grid;
+    gap: 0;
+  }
+
+  .facts__list > div {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: var(--space-3) 0;
+    border-top: 1px solid var(--color-border-subtle);
+    font-size: var(--text-sm);
+  }
+
+  dt {
+    color: var(--color-text-subtle);
+  }
+
+  dd {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    color: var(--color-text);
+    font-weight: var(--weight-medium);
+    text-align: right;
+  }
+
+  .facts__local {
+    color: var(--color-success);
+  }
+
+  .facts__local .icon {
+    width: 0.95rem;
+    height: 0.95rem;
+  }
+</style>

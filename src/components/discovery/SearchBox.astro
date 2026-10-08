@@ -1,0 +1,287 @@
+---
+import type { Locale } from '@/config/site';
+import { getDictionary } from '@/i18n';
+import Icon from '@/components/ui/Icon.astro';
+
+interface Props {
+  locale: Locale;
+  id: string;
+  variant?: 'inline' | 'dialog';
+  size?: 'md' | 'lg';
+}
+
+const { locale, id, variant = 'inline', size = 'md' } = Astro.props;
+const t = getDictionary(locale);
+const listId = `${id}-results`;
+const strings = JSON.stringify({
+  noResults: t.search.noResults,
+  noResultsHint: t.search.noResultsHint,
+  results: t.search.results,
+  loading: t.search.loading,
+  loadError: t.search.loadError,
+  suggestions: t.search.suggestions,
+});
+---
+
+<nx-search
+  class:list={['nx-search', `nx-search--${variant}`, `nx-search--${size}`]}
+  data-locale={locale}
+  data-index-url={`/search-index/${locale}.json`}
+  data-variant={variant}
+  data-strings={strings}
+>
+  <div class="nx-search__field">
+    <Icon name="search" class="nx-search__glyph" />
+    <label for={`${id}-input`} class="visually-hidden">{t.search.label}</label>
+    <input
+      id={`${id}-input`}
+      class="nx-search__input"
+      type="search"
+      role="combobox"
+      aria-autocomplete="list"
+      aria-expanded="false"
+      aria-controls={listId}
+      autocomplete="off"
+      autocapitalize="off"
+      spellcheck="false"
+      enterkeyhint="go"
+      placeholder={t.search.placeholder}
+      data-search-input
+    />
+  </div>
+  <div class="nx-search__panel" data-search-panel hidden={variant === 'inline'}>
+    <ul id={listId} class="nx-search__list" role="listbox" aria-label={t.search.label} data-search-list></ul>
+    <p class="nx-search__message" data-search-message hidden></p>
+    {
+      variant === 'dialog' && (
+        <div class="nx-search__foot" aria-hidden="true">
+          <span>
+            <span class="kbd">↑</span>
+            <span class="kbd">↓</span> {t.search.navigateHint}
+          </span>
+          <span>
+            <span class="kbd">↵</span> {t.search.selectHint}
+          </span>
+          <span>
+            <span class="kbd">Esc</span>
+          </span>
+        </div>
+      )
+    }
+  </div>
+  <p class="visually-hidden" role="status" aria-live="polite" data-search-status></p>
+</nx-search>
+
+<script>
+  import '@/scripts/search-element';
+</script>
+
+<style is:global>
+  .nx-search {
+    position: relative;
+    display: block;
+  }
+
+  .nx-search__field {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .nx-search__glyph {
+    position: absolute;
+    left: var(--space-4);
+    width: 1.25rem;
+    height: 1.25rem;
+    color: var(--color-text-subtle);
+    pointer-events: none;
+  }
+
+  .nx-search__input {
+    width: 100%;
+    min-height: 52px;
+    padding: 0 var(--space-4) 0 calc(var(--space-4) + 1.25rem + var(--space-3));
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-size: 1rem;
+    box-shadow: var(--highlight), var(--shadow-sm);
+    transition: border-color var(--duration-fast) var(--ease-standard), box-shadow var(--duration-fast) var(--ease-standard);
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  .nx-search__input::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+  }
+
+  .nx-search__input::placeholder {
+    color: var(--color-text-subtle);
+  }
+
+  .nx-search__input:hover {
+    border-color: var(--color-text-subtle);
+  }
+
+  .nx-search__input:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 4px var(--color-accent-soft), var(--shadow-md);
+  }
+
+  .nx-search--lg .nx-search__input {
+    min-height: 60px;
+    font-size: 1.0625rem;
+    border-radius: var(--radius-xl);
+  }
+
+  .nx-search--inline .nx-search__panel {
+    position: absolute;
+    top: calc(100% + var(--space-2));
+    left: 0;
+    right: 0;
+    z-index: var(--z-dropdown);
+    max-height: min(26rem, 60vh);
+    overflow-y: auto;
+    padding: var(--space-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-lg);
+    text-align: left;
+  }
+
+  .nx-search--dialog .nx-search__input {
+    border-radius: var(--radius-md);
+    border-color: transparent;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .nx-search--dialog .nx-search__input:focus {
+    box-shadow: none;
+    border-color: transparent;
+  }
+
+  .nx-search--dialog .nx-search__field {
+    border-bottom: 1px solid var(--color-border);
+    padding: var(--space-2);
+  }
+
+  .nx-search--dialog .nx-search__panel {
+    max-height: min(28rem, calc(100dvh - 12rem));
+    overflow-y: auto;
+    padding: var(--space-2);
+  }
+
+  .nx-search__heading {
+    padding: var(--space-2) var(--space-3) var(--space-1);
+    color: var(--color-text-subtle);
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+  }
+
+  .nx-search__list {
+    display: grid;
+    gap: 2px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .nx-search__link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-height: 56px;
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .nx-search__link:hover {
+    color: var(--color-text);
+  }
+
+  .nx-search__option[aria-selected='true'] .nx-search__link {
+    background: var(--color-surface-3);
+  }
+
+  .nx-search__icon {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-2);
+    color: var(--color-accent-text);
+  }
+
+  .nx-search__icon[data-hue='rose'] { color: var(--hue-rose); }
+  .nx-search__icon[data-hue='violet'] { color: var(--hue-violet); }
+  .nx-search__icon[data-hue='emerald'] { color: var(--hue-emerald); }
+
+  .nx-search__text {
+    display: grid;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .nx-search__name {
+    font-weight: var(--weight-medium);
+  }
+
+  .nx-search__desc {
+    overflow: hidden;
+    color: var(--color-text-subtle);
+    font-size: var(--text-sm);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .nx-search__cat {
+    flex: none;
+    color: var(--color-text-subtle);
+    font-size: var(--text-xs);
+  }
+
+  .nx-search__message {
+    padding: var(--space-4) var(--space-3);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .nx-search__foot {
+    display: none;
+    gap: var(--space-4);
+    padding: var(--space-3) var(--space-3) var(--space-1);
+    border-top: 1px solid var(--color-border-subtle);
+    margin-top: var(--space-2);
+    color: var(--color-text-subtle);
+    font-size: var(--text-xs);
+  }
+
+  .nx-search__foot > span {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .nx-search__foot {
+      display: flex;
+    }
+  }
+
+  @media (max-width: 479px) {
+    .nx-search__cat {
+      display: none;
+    }
+  }
+</style>

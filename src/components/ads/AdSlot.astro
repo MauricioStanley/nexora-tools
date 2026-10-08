@@ -1,0 +1,50 @@
+---
+/**
+ * Advertising placeholder. Renders NOTHING unless ads are enabled in src/config/ads.ts.
+ * When enabled it reserves its height up front (no layout shift) and is clearly labeled.
+ * Allowed placements are documented in ARCHITECTURE.md — never next to download buttons.
+ */
+import { adsConfig, isAdSlotEnabled, type AdSlotId } from '@/config/ads';
+
+interface Props {
+  id: AdSlotId;
+  label?: string;
+}
+
+const { id, label = 'Advertisement' } = Astro.props;
+const enabled = isAdSlotEnabled(id);
+---
+
+{
+  enabled && (
+    <aside class="ad-slot" data-ad-slot={id} data-ad-provider={adsConfig.provider} aria-label={label}>
+      <span class="ad-slot__label">{label}</span>
+    </aside>
+  )
+}
+
+<style>
+  .ad-slot {
+    display: grid;
+    place-items: center;
+    margin-block: var(--space-10);
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius-md);
+  }
+
+  .ad-slot[data-ad-slot='tool-below-content'] {
+    min-height: 280px;
+  }
+
+  .ad-slot[data-ad-slot='directory-footer'],
+  .ad-slot[data-ad-slot='home-footer'] {
+    min-height: 250px;
+  }
+
+  .ad-slot__label {
+    color: var(--color-text-subtle);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+  }
+</style>

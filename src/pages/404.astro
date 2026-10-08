@@ -1,0 +1,72 @@
+---
+/**
+ * Root fallback 404 (paths outside /en/ and /es/). Localized 404s live at /<locale>/404.html.
+ * Bilingual, noindex, no redirects.
+ */
+import '@/styles/fonts.css';
+import '@/styles/tokens.css';
+import '@/styles/base.css';
+import { brand } from '@/config/brand';
+import { DEFAULT_THEME, LOCALE_META, LOCALES } from '@/config/site';
+import { getDictionary } from '@/i18n';
+import { pathFor } from '@/lib/routing';
+import LogoMark from '@/components/ui/LogoMark.astro';
+---
+
+<!doctype html>
+<html lang="en" data-theme={DEFAULT_THEME}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <meta name="description" content={`${getDictionary('en').pages.notFound.text} ${getDictionary('es').pages.notFound.text}`} />
+    <title>404 · {brand.productName}</title>
+    <link rel="icon" href={brand.assets.favicon} type="image/svg+xml" />
+  </head>
+  <body>
+    <main class="nf">
+      <LogoMark id="nf" size={44} />
+      {
+        LOCALES.map((l) => {
+          const t = getDictionary(l);
+          return (
+            <section class="nf__block" lang={LOCALE_META[l].htmlLang}>
+              {l === 'en' ? <h1>{t.pages.notFound.title}</h1> : <h2>{t.pages.notFound.title}</h2>}
+              <p>{t.pages.notFound.text}</p>
+              <a class="btn btn--secondary" href={pathFor({ kind: 'home' }, l)}>
+                {t.pages.notFound.home}
+              </a>
+            </section>
+          );
+        })
+      }
+    </main>
+  </body>
+</html>
+
+<style>
+  .nf {
+    display: grid;
+    justify-items: center;
+    align-content: center;
+    gap: var(--space-8);
+    min-height: 100dvh;
+    padding: var(--space-8) var(--gutter);
+    text-align: center;
+  }
+
+  .nf__block {
+    display: grid;
+    justify-items: center;
+    gap: var(--space-3);
+  }
+
+  .nf__block h1,
+  .nf__block h2 {
+    font-size: var(--text-2xl);
+  }
+
+  .nf__block p {
+    color: var(--color-text-muted);
+  }
+</style>

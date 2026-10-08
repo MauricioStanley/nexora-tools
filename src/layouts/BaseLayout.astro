@@ -1,0 +1,82 @@
+---
+import '@/styles/fonts.css';
+import '@/styles/tokens.css';
+import '@/styles/base.css';
+import geistLatin from '@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url';
+import { brand } from '@/config/brand';
+import { analyticsConfig } from '@/config/analytics';
+import { DEFAULT_THEME, LOCALE_META, STORAGE_KEYS, type Locale } from '@/config/site';
+import type { PageSeo } from '@/lib/seo/meta';
+import Seo from '@/components/seo/Seo.astro';
+import Header, { type NavContext } from '@/components/layout/Header.astro';
+import MobileNav from '@/components/layout/MobileNav.astro';
+import Footer from '@/components/layout/Footer.astro';
+import LocaleSuggestion from '@/components/layout/LocaleSuggestion.astro';
+import SearchDialog from '@/components/discovery/SearchDialog.astro';
+import Analytics from '@/components/analytics/Analytics.astro';
+import { getDictionary } from '@/i18n';
+
+interface Props {
+  locale: Locale;
+  seo: PageSeo;
+  /** Same page in every locale (null when the page has no equivalents). */
+  alternates: Record<Locale, string> | null;
+  nav: NavContext;
+  jsonLd?: Array<Record<string, unknown> | null>;
+  /** Set on tool pages: enables recent-tool tracking and tool analytics. */
+  toolId?: string;
+  toolCategory?: string;
+}
+
+const { locale, seo, alternates, nav, jsonLd, toolId, toolCategory } = Astro.props;
+const t = getDictionary(locale);
+const themeKey = STORAGE_KEYS.theme;
+---
+
+<!doctype html>
+<html lang={LOCALE_META[locale].htmlLang} data-theme={DEFAULT_THEME}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <script is:inline define:vars={{ themeKey }}>
+      try {
+        var saved = localStorage.getItem(themeKey);
+        if (saved === 'light' || saved === 'dark') document.documentElement.dataset.theme = saved;
+      } catch (e) {}
+    </script>
+    <link rel="preload" href={geistLatin} as="font" type="font/woff2" crossorigin />
+    <Seo locale={locale} seo={seo} jsonLd={jsonLd} />
+    <link rel="icon" href={brand.assets.favicon} type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href={brand.assets.appleTouchIcon} />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content={brand.themeColor.dark} />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="format-detection" content="telephone=no" />
+  </head>
+  <body data-tool-id={toolId} data-tool-category={toolCategory}>
+    <a class="skip-link" href="#main">{t.a11y.skipToContent}</a>
+    <LocaleSuggestion locale={locale} alternates={alternates} />
+    <Header locale={locale} alternates={alternates} nav={nav} />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <Footer locale={locale} alternates={alternates} />
+    <MobileNav locale={locale} alternates={alternates} />
+    <SearchDialog locale={locale} />
+    {analyticsConfig.enabled && <Analytics locale={locale} />}
+    <script>
+      import '@/scripts/site';
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  html.has-dialog {
+    overflow: hidden;
+  }
+
+  main:focus {
+    outline: none;
+  }
+</style>

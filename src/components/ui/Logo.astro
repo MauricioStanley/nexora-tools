@@ -1,0 +1,67 @@
+---
+import { brand } from '@/config/brand';
+import type { Locale } from '@/config/site';
+import { fmt, getDictionary } from '@/i18n';
+import { pathFor } from '@/lib/routing';
+import LogoMark from './LogoMark.astro';
+
+interface Props {
+  locale: Locale;
+  /** Unique suffix for SVG ids when the logo appears more than once on a page. */
+  id: string;
+  showCompany?: boolean;
+}
+
+const { locale, id, showCompany = true } = Astro.props;
+const t = getDictionary(locale);
+---
+
+<a class="logo" href={pathFor({ kind: 'home' }, locale)} aria-label={fmt(t.a11y.logoHome)}>
+  <LogoMark id={id} />
+  <span class="logo__text" aria-hidden="true">
+    <span class="logo__name">Nexora <span class="logo__product">Tools</span></span>
+    {showCompany && <span class="logo__by">{fmt(t.common.byCompany, { company: brand.companyName })}</span>}
+  </span>
+</a>
+
+<style>
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-height: var(--tap-target);
+    color: var(--color-text);
+    text-decoration: none;
+    border-radius: var(--radius-sm);
+  }
+
+  .logo:hover {
+    color: var(--color-text);
+  }
+
+  .logo__text {
+    display: grid;
+    line-height: 1.1;
+  }
+
+  .logo__name {
+    font-size: 1.0625rem;
+    font-weight: var(--weight-semibold);
+    letter-spacing: -0.015em;
+    white-space: nowrap;
+  }
+
+  .logo__product {
+    font-weight: var(--weight-regular);
+    color: var(--color-text-muted);
+  }
+
+  .logo__by {
+    margin-top: 2px;
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-medium);
+    letter-spacing: 0.02em;
+    color: var(--color-text-subtle);
+    white-space: nowrap;
+  }
+</style>

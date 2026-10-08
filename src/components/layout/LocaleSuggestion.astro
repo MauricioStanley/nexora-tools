@@ -1,0 +1,96 @@
+---
+/**
+ * Non-intrusive language suggestion. Deep pages are never auto-redirected (bad for SEO and
+ * for users who chose a language on purpose). Instead, if the browser prefers another
+ * supported language and the visitor hasn't chosen one, a dismissible banner is shown —
+ * written in the *suggested* language. Logic lives in src/scripts/site.ts.
+ */
+import { featureFlags } from '@/config/features';
+import { LOCALE_META, type Locale } from '@/config/site';
+import { getDictionary, otherLocales } from '@/i18n';
+import { pathFor } from '@/lib/routing';
+import Icon from '@/components/ui/Icon.astro';
+
+interface Props {
+  locale: Locale;
+  alternates: Record<Locale, string> | null;
+}
+
+const { locale, alternates } = Astro.props;
+const suggestions = featureFlags.localeSuggestion ? otherLocales(locale) : [];
+---
+
+{
+  suggestions.map((target) => {
+    const tt = getDictionary(target);
+    const href = alternates?.[target] ?? pathFor({ kind: 'home' }, target);
+    return (
+      <div class="locale-suggest" data-locale-suggest={target} lang={LOCALE_META[target].htmlLang} hidden>
+        <div class="locale-suggest__inner">
+          <Icon name="globe" class="locale-suggest__icon" />
+          <p class="locale-suggest__text">{tt.language.suggestion}</p>
+          <a class="btn btn--secondary btn--sm" href={href} hreflang={LOCALE_META[target].htmlLang} data-locale-switch={target}>
+            {tt.language.suggestionAction}
+          </a>
+          <button type="button" class="btn btn--ghost btn--icon btn--sm" data-locale-dismiss aria-label={tt.language.dismiss}>
+            <Icon name="close" />
+          </button>
+        </div>
+      </div>
+    );
+  })
+}
+
+<style>
+  /*
+   * Floating, out of flow: appearing after load must never shift page content (CLS).
+   * Placed under the header so it never covers the sticky tool action bar on phones.
+   */
+  .locale-suggest {
+    position: fixed;
+    inset: calc(var(--header-height) + var(--space-2)) var(--space-3) auto;
+    z-index: var(--z-dropdown);
+    display: flex;
+    justify-content: flex-end;
+    pointer-events: none;
+  }
+
+  .locale-suggest__inner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    width: min(100%, 36rem);
+    padding: var(--space-2) var(--space-2) var(--space-2) var(--space-4);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-lg);
+    pointer-events: auto;
+    animation: suggest-in var(--duration-slow) var(--ease-out);
+  }
+
+  @keyframes suggest-in {
+    from {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+  }
+
+  .locale-suggest__icon {
+    flex: none;
+    color: var(--color-accent-text);
+  }
+
+  .locale-suggest__text {
+    flex: 1;
+    min-width: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+
+  @media (max-width: 479px) {
+    .locale-suggest__icon {
+      display: none;
+    }
+  }
+</style>

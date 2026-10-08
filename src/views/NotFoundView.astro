@@ -1,0 +1,95 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import SearchBox from '@/components/discovery/SearchBox.astro';
+import ToolGrid from '@/components/discovery/ToolGrid.astro';
+import Icon from '@/components/ui/Icon.astro';
+import type { Locale } from '@/config/site';
+import { getDictionary } from '@/i18n';
+import { pathFor } from '@/lib/routing';
+import { buildPageSeo } from '@/lib/seo/meta';
+import { getPopularTools } from '@/tools/registry';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = getDictionary(locale);
+const copy = t.pages.notFound;
+const seo = buildPageSeo({
+  locale,
+  title: copy.seoTitle,
+  description: copy.text,
+  path: pathFor({ kind: 'not-found' }, locale),
+  alternates: null,
+  noindex: true,
+});
+---
+
+<BaseLayout locale={locale} seo={seo} alternates={null} nav={{ section: 'other' }}>
+  <div class="container not-found">
+    <p class="not-found__code" aria-hidden="true">404</p>
+    <h1>{copy.title}</h1>
+    <p class="not-found__text">{copy.text}</p>
+    <div class="not-found__search">
+      <SearchBox locale={locale} id="not-found-search" />
+    </div>
+    <div class="not-found__actions">
+      <a class="btn btn--primary" href={pathFor({ kind: 'home' }, locale)}>{copy.home}</a>
+      <a class="btn btn--secondary" href={pathFor({ kind: 'tools' }, locale)}>
+        {copy.tools}
+        <Icon name="arrow-right" />
+      </a>
+    </div>
+    <section class="not-found__popular" aria-labelledby="nf-popular">
+      <h2 id="nf-popular">{t.home.popularTitle}</h2>
+      <ToolGrid tools={getPopularTools(3)} locale={locale} />
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .not-found {
+    padding-top: var(--space-16);
+  }
+
+  .not-found__code {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--color-accent-text);
+    letter-spacing: 0.2em;
+  }
+
+  .not-found h1 {
+    margin-top: var(--space-2);
+    font-size: var(--text-4xl);
+    letter-spacing: var(--tracking-tighter);
+  }
+
+  .not-found__text {
+    margin-top: var(--space-3);
+    color: var(--color-text-muted);
+    font-size: var(--text-md);
+  }
+
+  .not-found__search {
+    max-width: 32rem;
+    margin-top: var(--space-8);
+  }
+
+  .not-found__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-top: var(--space-5);
+  }
+
+  .not-found__popular {
+    margin-top: var(--space-16);
+  }
+
+  .not-found__popular h2 {
+    margin-bottom: var(--space-4);
+    font-size: var(--text-xl);
+  }
+</style>

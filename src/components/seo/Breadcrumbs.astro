@@ -1,0 +1,87 @@
+---
+import type { Locale } from '@/config/site';
+import { getDictionary } from '@/i18n';
+import type { Crumb } from '@/lib/seo/schema';
+import Icon from '@/components/ui/Icon.astro';
+
+interface Props {
+  items: Crumb[];
+  locale: Locale;
+}
+
+const { items, locale } = Astro.props;
+const t = getDictionary(locale);
+---
+
+<nav class="breadcrumbs" aria-label={t.a11y.breadcrumb}>
+  <ol role="list">
+    {
+      items.map((item, index) => {
+        const last = index === items.length - 1;
+        return (
+          <li>
+            {last ? (
+              <span aria-current="page">{item.name}</span>
+            ) : (
+              <>
+                <a href={item.path}>{item.name}</a>
+                <Icon name="chevron-right" class="breadcrumbs__sep" />
+              </>
+            )}
+          </li>
+        );
+      })
+    }
+  </ol>
+</nav>
+
+<style>
+  .breadcrumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-1) var(--space-1);
+    font-size: var(--text-sm);
+  }
+
+  .breadcrumbs li {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    min-width: 0;
+  }
+
+  .breadcrumbs a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 32px;
+    color: var(--color-text-subtle);
+    text-decoration: none;
+  }
+
+  .breadcrumbs a:hover {
+    color: var(--color-text);
+  }
+
+  .breadcrumbs [aria-current='page'] {
+    color: var(--color-text-muted);
+  }
+
+  /* Phones: the current page is already the H1 — drop it to keep the trail on one line. */
+  @media (max-width: 479px) {
+    .breadcrumbs li:last-child {
+      display: none;
+    }
+
+    .breadcrumbs li:nth-last-child(2) .breadcrumbs__sep {
+      display: none;
+    }
+  }
+
+  .breadcrumbs__sep {
+    width: 0.875rem;
+    height: 0.875rem;
+    color: var(--color-text-subtle);
+    opacity: 0.6;
+  }
+</style>

@@ -1,0 +1,85 @@
+---
+/** FAQ as native <details> disclosures: accessible, keyboard-friendly, zero JavaScript. */
+import type { ToolFaqItem } from '@/tools/types';
+import Icon from '@/components/ui/Icon.astro';
+
+interface Props {
+  title: string;
+  items: ToolFaqItem[];
+}
+
+const { title, items } = Astro.props;
+---
+
+<section class="faq" aria-labelledby="faq-title">
+  <h2 id="faq-title" class="faq__title">{title}</h2>
+  <div class="faq__list">
+    {
+      items.map((item) => (
+        <details class="faq__item">
+          <summary class="faq__question">
+            <h3>{item.question}</h3>
+            <Icon name="plus" class="faq__icon" />
+          </summary>
+          <p class="faq__answer">{item.answer}</p>
+        </details>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .faq__title {
+    margin-bottom: var(--space-6);
+    font-size: var(--text-2xl);
+  }
+
+  .faq__list {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .faq__item {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .faq__question {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    min-height: 60px;
+    padding: var(--space-3) 0;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .faq__question::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq__question h3 {
+    font-size: var(--text-base);
+    font-weight: var(--weight-medium);
+    letter-spacing: -0.005em;
+  }
+
+  .faq__question:hover h3 {
+    color: var(--color-accent-text);
+  }
+
+  .faq__icon {
+    flex: none;
+    color: var(--color-text-subtle);
+    transition: transform var(--duration-base) var(--ease-out);
+  }
+
+  .faq__item[open] .faq__icon {
+    transform: rotate(45deg);
+  }
+
+  .faq__answer {
+    max-width: 44rem;
+    padding-bottom: var(--space-5);
+    color: var(--color-text-muted);
+  }
+</style>

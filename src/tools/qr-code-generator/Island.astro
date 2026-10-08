@@ -1,0 +1,10 @@
+---
+/** Hydration boundary for this tool: Astro needs a static import to hydrate an island. */
+import type { ComponentProps } from 'react';
+import Tool from './Tool';
+
+type Props = ComponentProps<typeof Tool>;
+const props = Astro.props;
+---
+
+<Tool client:load {...props} />

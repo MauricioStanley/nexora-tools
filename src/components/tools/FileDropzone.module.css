@@ -1,0 +1,125 @@
+.zone {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  padding: clamp(1.75rem, 1rem + 4vw, 3.5rem) var(--space-4);
+  border: 1.5px dashed var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(60% 80% at 50% 0%, var(--glow-accent) 0%, transparent 70%),
+    var(--color-surface-inset);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color var(--duration-fast) var(--ease-standard), background-color var(--duration-fast) var(--ease-standard);
+}
+
+.zone:hover {
+  border-color: var(--color-accent-border);
+}
+
+.zone[data-active='true'] {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+
+.zone[data-disabled='true'] {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.glyph {
+  display: grid;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  border: 1px solid var(--color-accent-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-text);
+  transition: transform var(--duration-base) var(--ease-out);
+}
+
+.glyph :global(.icon) {
+  width: 1.6rem;
+  height: 1.6rem;
+}
+
+.zone[data-active='true'] .glyph {
+  transform: translateY(-3px) scale(1.04);
+}
+
+.title {
+  font-size: var(--text-xl);
+  font-weight: var(--weight-semibold);
+  letter-spacing: -0.015em;
+}
+
+.or {
+  color: var(--color-text-subtle);
+  font-size: var(--text-sm);
+}
+
+.hint {
+  max-width: 28rem;
+  color: var(--color-text-subtle);
+  font-size: var(--text-xs);
+  line-height: var(--leading-normal);
+}
+
+.hint span + span::before {
+  content: '·';
+  margin-inline: var(--space-2);
+}
+
+.paste {
+  display: none;
+  color: var(--color-text-subtle);
+  font-size: var(--text-xs);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .paste {
+    display: block;
+  }
+}
+
+/* Touch devices: dragging is rare, so lead with the button. */
+@media (pointer: coarse) {
+  .title,
+  .or {
+    display: none;
+  }
+}
+
+.compact {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 52px;
+  padding: var(--space-2) var(--space-4);
+  border: 1.5px dashed var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+  width: 100%;
+  transition: border-color var(--duration-fast) var(--ease-standard), color var(--duration-fast) var(--ease-standard);
+}
+
+.compact:hover,
+.compact[data-active='true'] {
+  border-color: var(--color-accent);
+  color: var(--color-text);
+}
+
+.compact[data-active='true'] {
+  background: var(--color-accent-soft);
+}
+
+.input {
+  display: none;
+}

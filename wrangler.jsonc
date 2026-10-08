@@ -1,0 +1,12 @@
+// Optional: deploy as a Cloudflare Worker with static assets (alternative to Cloudflare Pages).
+// See DEPLOYMENT.md. Cloudflare Pages Git integration does not need this file.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "nexora-tools",
+  "compatibility_date": "2026-09-01",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "404-page",
+    "html_handling": "force-trailing-slash"
+  }
+}

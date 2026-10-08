@@ -1,0 +1,44 @@
+---
+/**
+ * Every localized page is generated from the route table in src/lib/routing.
+ * Adding a tool or category never requires a new page file.
+ */
+import { getAllRoutes, type PageRoute } from '@/lib/routing';
+import { validateRegistry } from '@/tools/registry';
+import { hasToolIsland } from '@/tools/islands';
+import HomeView from '@/views/HomeView.astro';
+import ToolsIndexView from '@/views/ToolsIndexView.astro';
+import CategoryView from '@/views/CategoryView.astro';
+import ToolView from '@/views/ToolView.astro';
+import PageView from '@/views/PageView.astro';
+import NotFoundView from '@/views/NotFoundView.astro';
+
+export function getStaticPaths() {
+  const issues = validateRegistry();
+  const routes = getAllRoutes();
+  for (const route of routes) {
+    if (route.key.kind === 'tool' && !hasToolIsland(route.key.toolId)) {
+      issues.push({ toolId: route.key.toolId, message: 'missing Island.astro' });
+    }
+  }
+  if (issues.length > 0) {
+    throw new Error(`Tool registry validation failed:\n${issues.map((i) => `  • ${i.toolId}: ${i.message}`).join('\n')}`);
+  }
+  const seen = new Set<string>();
+  return routes.map((route) => {
+    if (seen.has(route.path)) throw new Error(`Duplicate route path ${route.path}`);
+    seen.add(route.path);
+    return { params: { path: route.path.replace(/^\/|\/$/g, '') }, props: { route } };
+  });
+}
+
+const { route } = Astro.props as { route: PageRoute };
+const { key, locale } = route;
+---
+
+{key.kind === 'home' && <HomeView locale={locale} />}
+{key.kind === 'tools' && <ToolsIndexView locale={locale} />}
+{key.kind === 'category' && <CategoryView locale={locale} categoryId={key.categoryId} />}
+{key.kind === 'tool' && <ToolView locale={locale} toolId={key.toolId} />}
+{key.kind === 'page' && <PageView locale={locale} pageId={key.pageId} />}
+{key.kind === 'not-found' && <NotFoundView locale={locale} />}

@@ -1,0 +1,387 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/seo/Breadcrumbs.astro';
+import PrivacyBadge from '@/components/tool-page/PrivacyBadge.astro';
+import ToolInstructions from '@/components/tool-page/ToolInstructions.astro';
+import ToolFAQ from '@/components/tool-page/ToolFAQ.astro';
+import ToolFacts from '@/components/tool-page/ToolFacts.astro';
+import ToolGrid from '@/components/discovery/ToolGrid.astro';
+import AdSlot from '@/components/ads/AdSlot.astro';
+import Icon from '@/components/ui/Icon.astro';
+import type { ToolIslandProps } from '@/components/tools/types';
+import { getActivePlan } from '@/config/features';
+import type { Locale } from '@/config/site';
+import { getCategory } from '@/data/categories';
+import { fmt, getDictionary } from '@/i18n';
+import { acceptAttribute, formatLabels } from '@/lib/files/types';
+import { alternatesFor, pathFor } from '@/lib/routing';
+import { buildPageSeo } from '@/lib/seo/meta';
+import { breadcrumbSchema, faqSchema, toolSchema } from '@/lib/seo/schema';
+import { loadToolIsland } from '@/tools/islands';
+import { getRelatedTools, getTool } from '@/tools/registry';
+
+interface Props {
+  toolId: string;
+  locale: Locale;
+}
+
+const { toolId, locale } = Astro.props;
+const t = getDictionary(locale);
+const tool = getTool(toolId);
+const content = tool.content[locale];
+const category = getCategory(tool.category);
+const categoryContent = category.content[locale];
+const key = { kind: 'tool', toolId } as const;
+const path = pathFor(key, locale);
+const categoryPath = pathFor({ kind: 'category', categoryId: category.id }, locale);
+const related = getRelatedTools(tool);
+const plan = getActivePlan();
+
+const crumbs = [
+  { name: t.nav.home, path: pathFor({ kind: 'home' }, locale) },
+  { name: t.nav.tools, path: pathFor({ kind: 'tools' }, locale) },
+  { name: categoryContent.name, path: categoryPath },
+  { name: content.name, path },
+];
+
+const seo = buildPageSeo({
+  locale,
+  title: content.seo.title,
+  description: content.seo.description,
+  path,
+  alternates: alternatesFor(key),
+});
+
+const islandProps: ToolIslandProps = {
+  toolId,
+  toolName: content.name,
+  locale,
+  ui: content.ui,
+  common: t.tool,
+  input: {
+    ...tool.input,
+    acceptAttr: acceptAttribute(tool.input.accept),
+    formatLabels: formatLabels(tool.input.accept),
+    effectiveMaxFiles: Math.round(tool.input.maxFiles * plan.fileCountMultiplier),
+    effectiveMaxFileSizeMB: tool.input.maxFileSizeMB * plan.fileSizeMultiplier,
+  },
+  related: related.map((r) => ({
+    id: r.id,
+    name: r.content[locale].name,
+    href: pathFor({ kind: 'tool', toolId: r.id }, locale),
+    icon: r.icon,
+  })),
+};
+
+const Island = await loadToolIsland(toolId);
+---
+
+<BaseLayout
+  locale={locale}
+  seo={seo}
+  alternates={alternatesFor(key)}
+  nav={{ section: 'tool', categoryId: category.id }}
+  toolId={toolId}
+  toolCategory={category.id}
+  jsonLd={[toolSchema(tool, content, locale, path), breadcrumbSchema(crumbs), faqSchema(content.faq)]}
+>
+  <div class="tool-page" data-hue={category.hue}>
+    <div class="tool-page__backdrop" aria-hidden="true"></div>
+    <div class="container">
+      <Breadcrumbs items={crumbs} locale={locale} />
+
+      <header class="tool-hero">
+        <div class="tool-hero__icon" aria-hidden="true">
+          <Icon name={tool.icon} />
+        </div>
+        <div class="tool-hero__text">
+          <h1 class="tool-hero__title">{content.name}</h1>
+          <p class="tool-hero__lead">{content.description}</p>
+        </div>
+        <div class="tool-hero__meta">
+          <PrivacyBadge mode={tool.executionMode} locale={locale} hasFiles={tool.input.kind === 'files'} />
+        </div>
+      </header>
+
+      <section class="tool-app" aria-label={fmt(t.toolPage.appLabel, { tool: content.name })}>
+        <Island {...islandProps} />
+      </section>
+    </div>
+
+    <div class="container">
+      <AdSlot id="tool-below-content" />
+
+      <div class="tool-info">
+        <div class="tool-info__main">
+          <ToolInstructions title={t.toolPage.howItWorks} steps={content.howTo} />
+
+          <section class="tool-about" aria-labelledby="about-title">
+            <h2 id="about-title">{t.toolPage.about}</h2>
+            {content.about.map((paragraph) => <p>{paragraph}</p>)}
+            {
+              content.limitations.length > 0 && (
+                <div class="tool-about__notes">
+                  <h3>
+                    <Icon name="info" />
+                    {t.toolPage.goodToKnow}
+                  </h3>
+                  <ul>
+                    {content.limitations.map((note) => (
+                      <li>{note}</li>
+                    ))}
+                  </ul>
+                </div>
+              )
+            }
+          </section>
+        </div>
+        <div class="tool-info__side">
+          <ToolFacts tool={tool} locale={locale} />
+        </div>
+      </div>
+
+      <div class="tool-faq">
+        <ToolFAQ title={t.toolPage.faq} items={content.faq} />
+      </div>
+
+      {
+        related.length > 0 && (
+          <section class="tool-related" aria-labelledby="related-title">
+            <div class="section-head">
+              <h2 id="related-title">{t.toolPage.related}</h2>
+              <p>{t.toolPage.relatedLead}</p>
+            </div>
+            <ToolGrid tools={related} locale={locale} relatedSource="related" columns={related.length > 3 ? 4 : 3} />
+          </section>
+        )
+      }
+
+      <section class="tool-explore">
+        <div>
+          <h2>{t.toolPage.exploreTitle}</h2>
+          <p>{t.toolPage.exploreText}</p>
+        </div>
+        <div class="tool-explore__actions">
+          <a class="btn btn--secondary" href={categoryPath}>
+            {fmt(t.toolPage.moreInCategory, { category: categoryContent.name })}
+          </a>
+          <a class="btn btn--primary" href={pathFor({ kind: 'tools' }, locale)}>
+            {t.toolPage.exploreAll}
+            <Icon name="arrow-right" />
+          </a>
+        </div>
+      </section>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .tool-page {
+    --hue: var(--color-accent-text);
+    position: relative;
+    isolation: isolate;
+    padding-top: var(--space-4);
+  }
+
+  .tool-page[data-hue='rose'] { --hue: var(--hue-rose); }
+  .tool-page[data-hue='violet'] { --hue: var(--hue-violet); }
+  .tool-page[data-hue='emerald'] { --hue: var(--hue-emerald); }
+
+  .tool-page__backdrop {
+    position: absolute;
+    inset: 0 0 auto;
+    height: 520px;
+    background:
+      radial-gradient(60% 70% at 50% 0%, var(--glow-accent) 0%, transparent 70%),
+      linear-gradient(to bottom, transparent 60%, var(--color-bg));
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .tool-hero {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--space-4);
+    align-items: start;
+    margin-top: var(--space-3);
+    margin-bottom: var(--space-5);
+  }
+
+  .tool-hero__icon {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: color-mix(in srgb, var(--hue) 10%, var(--color-surface));
+    color: var(--hue);
+    box-shadow: var(--highlight);
+  }
+
+  .tool-hero__icon .icon {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .tool-hero__title {
+    font-size: var(--text-4xl);
+    letter-spacing: var(--tracking-tighter);
+    line-height: var(--leading-tight);
+  }
+
+  .tool-hero__lead {
+    max-width: 40rem;
+    margin-top: var(--space-2);
+    color: var(--color-text-muted);
+    font-size: var(--text-base);
+  }
+
+  .tool-hero__meta {
+    grid-column: 1 / -1;
+  }
+
+  .tool-app {
+    position: relative;
+  }
+
+  .tool-info {
+    display: grid;
+    gap: var(--space-10);
+    margin-top: var(--space-section);
+  }
+
+  .tool-info__main {
+    display: grid;
+    gap: var(--space-12);
+    min-width: 0;
+  }
+
+  .tool-about h2 {
+    margin-bottom: var(--space-4);
+    font-size: var(--text-2xl);
+  }
+
+  .tool-about p {
+    max-width: 44rem;
+    color: var(--color-text-muted);
+  }
+
+  .tool-about p + p {
+    margin-top: var(--space-3);
+  }
+
+  .tool-about__notes {
+    margin-top: var(--space-6);
+    padding: var(--space-5);
+    border: 1px solid var(--color-border);
+    border-left: 3px solid var(--color-accent);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+  }
+
+  .tool-about__notes h3 {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-3);
+    font-size: var(--text-base);
+  }
+
+  .tool-about__notes h3 .icon {
+    color: var(--color-accent-text);
+  }
+
+  .tool-about__notes ul {
+    display: grid;
+    gap: var(--space-2);
+    padding-left: 1.1rem;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .tool-faq,
+  .tool-related {
+    margin-top: var(--space-section);
+  }
+
+  .tool-explore {
+    display: grid;
+    gap: var(--space-5);
+    margin-top: var(--space-section);
+    padding: var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    background: linear-gradient(135deg, var(--color-surface) 0%, var(--color-surface-2) 100%);
+  }
+
+  .tool-explore h2 {
+    font-size: var(--text-2xl);
+  }
+
+  .tool-explore p {
+    margin-top: var(--space-2);
+    color: var(--color-text-muted);
+  }
+
+  .tool-explore__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  @media (max-width: 479px) {
+    .tool-explore__actions .btn {
+      width: 100%;
+      white-space: normal;
+      text-align: center;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .tool-hero {
+      margin-top: var(--space-8);
+      margin-bottom: var(--space-8);
+      column-gap: var(--space-5);
+    }
+
+    .tool-hero__icon {
+      width: 60px;
+      height: 60px;
+      border-radius: var(--radius-lg);
+    }
+
+    .tool-hero__lead {
+      margin-top: var(--space-3);
+      font-size: var(--text-md);
+    }
+
+    .tool-hero__icon .icon {
+      width: 1.75rem;
+      height: 1.75rem;
+    }
+
+    /* Badge sits under the lead, aligned with the text column. */
+    .tool-hero__meta {
+      grid-column: 2;
+    }
+
+    .tool-explore {
+      grid-template-columns: 1fr auto;
+      align-items: center;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .tool-info {
+      grid-template-columns: minmax(0, 1fr) 20rem;
+      align-items: start;
+    }
+
+    .tool-info__side {
+      position: sticky;
+      top: calc(var(--header-height) + var(--space-6));
+    }
+  }
+
+</style>

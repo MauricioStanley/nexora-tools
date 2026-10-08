@@ -1,0 +1,42 @@
+---
+import type { Locale } from '@/config/site';
+import { getDictionary } from '@/i18n';
+import Icon from '@/components/ui/Icon.astro';
+
+interface Props {
+  locale: Locale;
+  class?: string;
+  [key: `data-${string}`]: unknown;
+}
+
+// `...rest` carries Astro's scoped-style attribute so parents can position/hide the toggle.
+const { locale, class: className, ...rest } = Astro.props;
+const t = getDictionary(locale);
+---
+
+<button
+  type="button"
+  class:list={['btn btn--ghost btn--icon btn--sm theme-toggle', className]}
+  data-theme-toggle
+  data-label-dark={t.theme.toDark}
+  data-label-light={t.theme.toLight}
+  aria-label={t.theme.toLight}
+  {...rest}
+>
+  <Icon name="sun" class="theme-toggle__sun" />
+  <Icon name="moon" class="theme-toggle__moon" />
+</button>
+
+<style>
+  .theme-toggle .theme-toggle__moon {
+    display: none;
+  }
+
+  :global(:root[data-theme='light']) .theme-toggle .theme-toggle__sun {
+    display: none;
+  }
+
+  :global(:root[data-theme='light']) .theme-toggle .theme-toggle__moon {
+    display: block;
+  }
+</style>

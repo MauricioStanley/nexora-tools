@@ -1,0 +1,166 @@
+---
+import type { Locale } from '@/config/site';
+import type { CategoryDefinition } from '@/data/categories';
+import { getDictionary, plural } from '@/i18n';
+import { pathFor } from '@/lib/routing';
+import { getToolsByCategory } from '@/tools/registry';
+import Icon from '@/components/ui/Icon.astro';
+
+interface Props {
+  category: CategoryDefinition;
+  locale: Locale;
+  headingLevel?: 'h2' | 'h3';
+}
+
+const { category, locale, headingLevel = 'h3' } = Astro.props;
+const t = getDictionary(locale);
+const content = category.content[locale];
+const tools = getToolsByCategory(category.id);
+const Heading = headingLevel;
+const href = pathFor({ kind: 'category', categoryId: category.id }, locale);
+---
+
+<section class="category-card" data-hue={category.hue}>
+  <header class="category-card__head">
+    <span class="category-card__icon">
+      <Icon name={category.icon} />
+    </span>
+    <div class="category-card__titles">
+      <Heading class="category-card__title">
+        <a href={href} data-astro-prefetch>{content.name}</a>
+      </Heading>
+      <span class="category-card__count">{plural(t.common.toolsCount, tools.length, locale)}</span>
+    </div>
+  </header>
+  <p class="category-card__desc">{content.description}</p>
+  <ul class="category-card__tools" role="list">
+    {
+      tools.map((tool) => (
+        <li>
+          <a href={pathFor({ kind: 'tool', toolId: tool.id }, locale)}>
+            <Icon name={tool.icon} />
+            <span>{tool.content[locale].name}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+  <a class="category-card__all" href={href}>
+    {t.common.viewAll}
+    <Icon name="arrow-right" />
+  </a>
+</section>
+
+<style>
+  .category-card {
+    --hue: var(--color-accent-text);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    height: 100%;
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    background: linear-gradient(180deg, color-mix(in srgb, var(--hue) 4%, var(--color-surface)) 0%, var(--color-surface) 45%);
+    box-shadow: var(--highlight);
+  }
+
+  .category-card[data-hue='rose'] { --hue: var(--hue-rose); }
+  .category-card[data-hue='violet'] { --hue: var(--hue-violet); }
+  .category-card[data-hue='emerald'] { --hue: var(--hue-emerald); }
+
+  .category-card__head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .category-card__icon {
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: color-mix(in srgb, var(--hue) 10%, var(--color-surface-2));
+    color: var(--hue);
+  }
+
+  .category-card__titles {
+    display: grid;
+  }
+
+  .category-card__title {
+    font-size: var(--text-xl);
+  }
+
+  .category-card__title a {
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .category-card__title a:hover {
+    color: var(--color-accent-text);
+  }
+
+  .category-card__count {
+    color: var(--color-text-subtle);
+    font-size: var(--text-xs);
+  }
+
+  .category-card__desc {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .category-card__tools {
+    display: grid;
+    gap: 2px;
+    margin-inline: calc(var(--space-2) * -1);
+  }
+
+  .category-card__tools a {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-height: 44px;
+    padding: 0 var(--space-2);
+    border-radius: var(--radius-sm);
+    color: var(--color-text);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    text-decoration: none;
+  }
+
+  .category-card__tools a:hover {
+    background: var(--color-surface-2);
+    color: var(--color-text);
+  }
+
+  .category-card__tools .icon {
+    width: 1.1rem;
+    height: 1.1rem;
+    color: var(--hue);
+  }
+
+  .category-card__all {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    margin-top: auto;
+    min-height: 40px;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    text-decoration: none;
+  }
+
+  .category-card__all:hover {
+    color: var(--color-accent-text);
+  }
+
+  .category-card__all .icon {
+    width: 1rem;
+    height: 1rem;
+  }
+</style>

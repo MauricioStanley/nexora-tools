@@ -1,0 +1,75 @@
+---
+/**
+ * GA4 with explicit opt-in (Consent Mode "basic"): no Google script is requested until the
+ * visitor accepts. Rendered only when analytics is enabled (production + PUBLIC_GA4_ID).
+ */
+import { analyticsConfig } from '@/config/analytics';
+import type { Locale } from '@/config/site';
+import { fmt, getDictionary } from '@/i18n';
+import { pathFor } from '@/lib/routing';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = getDictionary(locale);
+---
+
+<div class="consent" data-consent data-ga-id={analyticsConfig.ga4MeasurementId} role="region" aria-label={fmt(t.consent.title)} hidden>
+  <div class="consent__inner">
+    <p class="consent__text">
+      <strong>{fmt(t.consent.title)}</strong>
+      {t.consent.text}
+      <a href={pathFor({ kind: 'page', pageId: 'privacy' }, locale)}>{t.consent.policy}</a>
+    </p>
+    <div class="consent__actions">
+      <button type="button" class="btn btn--secondary btn--sm" data-consent-decline>{t.consent.decline}</button>
+      <button type="button" class="btn btn--primary btn--sm" data-consent-accept>{t.consent.accept}</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  import '@/scripts/analytics-consent';
+</script>
+
+<style>
+  .consent {
+    position: fixed;
+    inset: auto var(--space-3) var(--space-3);
+    z-index: var(--z-toast);
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+  }
+
+  .consent__inner {
+    display: grid;
+    gap: var(--space-3);
+    width: min(100%, 42rem);
+    padding: var(--space-4);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-lg);
+    pointer-events: auto;
+  }
+
+  .consent__text {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  .consent__text strong {
+    display: block;
+    margin-bottom: var(--space-1);
+    color: var(--color-text);
+  }
+
+  .consent__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-2);
+  }
+</style>

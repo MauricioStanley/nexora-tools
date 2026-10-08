@@ -1,0 +1,194 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/seo/Breadcrumbs.astro';
+import ToolGrid from '@/components/discovery/ToolGrid.astro';
+import AdSlot from '@/components/ads/AdSlot.astro';
+import Icon from '@/components/ui/Icon.astro';
+import type { Locale } from '@/config/site';
+import { getCategories } from '@/data/categories';
+import { fmt, getDictionary, plural } from '@/i18n';
+import { alternatesFor, pathFor } from '@/lib/routing';
+import { buildPageSeo } from '@/lib/seo/meta';
+import { breadcrumbSchema, collectionSchema } from '@/lib/seo/schema';
+import { getToolsByCategory, listedTools } from '@/tools/registry';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = getDictionary(locale);
+const key = { kind: 'tools' } as const;
+const path = pathFor(key, locale);
+const seo = buildPageSeo({
+  locale,
+  title: t.directory.seoTitle,
+  description: t.directory.seoDescription,
+  path,
+  alternates: alternatesFor(key),
+});
+const crumbs = [
+  { name: t.nav.home, path: pathFor({ kind: 'home' }, locale) },
+  { name: t.directory.title, path },
+];
+const groups = getCategories()
+  .map((category) => ({ category, tools: getToolsByCategory(category.id) }))
+  .filter((g) => g.tools.length > 0);
+const schema = collectionSchema({
+  name: t.directory.title,
+  description: t.directory.seoDescription,
+  path,
+  locale,
+  items: listedTools.map((tool) => ({ name: tool.content[locale].name, path: pathFor({ kind: 'tool', toolId: tool.id }, locale) })),
+});
+---
+
+<BaseLayout locale={locale} seo={seo} alternates={alternatesFor(key)} nav={{ section: 'tools' }} jsonLd={[schema, breadcrumbSchema(crumbs)]}>
+  <div class="container directory">
+    <Breadcrumbs items={crumbs} locale={locale} />
+    <header class="directory__head">
+      <h1>{t.directory.title}</h1>
+      <p>{fmt(t.directory.lead)}</p>
+    </header>
+
+    <div
+      class="directory__filter"
+      data-tool-filter
+      data-locale={locale}
+      data-index-url={`/search-index/${locale}.json`}
+      data-showing={JSON.stringify(t.directory.showing)}
+    >
+      <label class="visually-hidden" for="tool-filter">{t.directory.filterLabel}</label>
+      <Icon name="search" class="directory__filter-icon" />
+      <input
+        id="tool-filter"
+        class="input directory__input"
+        type="search"
+        placeholder={t.directory.filterPlaceholder}
+        autocomplete="off"
+        spellcheck="false"
+        aria-describedby="filter-count"
+      />
+      <p id="filter-count" class="directory__count" role="status" aria-live="polite" data-filter-count>
+        {plural(t.directory.showing, listedTools.length, locale)}
+      </p>
+    </div>
+
+    {
+      groups.map(({ category, tools }) => (
+        <section class="directory__group" data-filter-group aria-labelledby={`group-${category.id}`}>
+          <div class="directory__group-head">
+            <h2 id={`group-${category.id}`}>{category.content[locale].name}</h2>
+            <a href={pathFor({ kind: 'category', categoryId: category.id }, locale)}>
+              {t.common.viewAll}
+              <Icon name="arrow-right" />
+            </a>
+          </div>
+          <ToolGrid tools={tools} locale={locale} />
+        </section>
+      ))
+    }
+
+    <p class="directory__empty" data-filter-empty hidden>{t.directory.empty}</p>
+    <AdSlot id="directory-footer" />
+  </div>
+</BaseLayout>
+
+<script>
+  import '@/scripts/tool-filter';
+</script>
+
+<style>
+  .directory {
+    padding-top: var(--space-4);
+  }
+
+  .directory__head {
+    margin-top: var(--space-6);
+    max-width: 44rem;
+  }
+
+  .directory__head h1 {
+    font-size: var(--text-4xl);
+    letter-spacing: var(--tracking-tighter);
+    line-height: var(--leading-tight);
+  }
+
+  .directory__head p {
+    margin-top: var(--space-3);
+    color: var(--color-text-muted);
+    font-size: var(--text-md);
+  }
+
+  .directory__filter {
+    position: relative;
+    display: grid;
+    gap: var(--space-2);
+    max-width: 32rem;
+    margin-block: var(--space-8) var(--space-4);
+  }
+
+  .directory__filter-icon {
+    position: absolute;
+    top: 14px;
+    left: var(--space-3);
+    width: 1.1rem;
+    height: 1.1rem;
+    color: var(--color-text-subtle);
+    pointer-events: none;
+  }
+
+  .directory__input {
+    min-height: 48px;
+    padding-left: calc(var(--space-3) * 2 + 1.1rem);
+    border-radius: var(--radius-md);
+  }
+
+  .directory__count {
+    color: var(--color-text-subtle);
+    font-size: var(--text-sm);
+  }
+
+  .directory__group {
+    margin-top: var(--space-10);
+  }
+
+  .directory__group-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-4);
+    margin-bottom: var(--space-4);
+  }
+
+  .directory__group-head h2 {
+    font-size: var(--text-2xl);
+  }
+
+  .directory__group-head a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    text-decoration: none;
+  }
+
+  .directory__group-head a:hover {
+    color: var(--color-accent-text);
+  }
+
+  .directory__group-head .icon {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .directory__empty {
+    margin-top: var(--space-10);
+    padding: var(--space-8);
+    border: 1px dashed var(--color-border-strong);
+    border-radius: var(--radius-lg);
+    color: var(--color-text-muted);
+    text-align: center;
+  }
+</style>

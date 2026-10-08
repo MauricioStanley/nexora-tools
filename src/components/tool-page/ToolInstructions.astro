@@ -1,0 +1,71 @@
+---
+import type { ToolHowToStep } from '@/tools/types';
+
+interface Props {
+  title: string;
+  steps: ToolHowToStep[];
+}
+
+const { title, steps } = Astro.props;
+---
+
+<section class="howto" aria-labelledby="howto-title">
+  <h2 id="howto-title" class="howto__title">{title}</h2>
+  <ol class="howto__steps" role="list">
+    {
+      steps.map((step, index) => (
+        <li class="howto__step">
+          <span class="howto__num" aria-hidden="true">
+            {String(index + 1).padStart(2, '0')}
+          </span>
+          <div>
+            <h3 class="howto__step-title">{step.title}</h3>
+            <p class="howto__step-text">{step.text}</p>
+          </div>
+        </li>
+      ))
+    }
+  </ol>
+</section>
+
+<style>
+  .howto__title {
+    margin-bottom: var(--space-6);
+    font-size: var(--text-2xl);
+  }
+
+  .howto__steps {
+    display: grid;
+    gap: var(--space-3);
+    counter-reset: step;
+  }
+
+  .howto__step {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-5);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+  }
+
+  .howto__num {
+    color: var(--color-accent-text);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    line-height: 1.6;
+  }
+
+  .howto__step-title {
+    font-size: var(--text-base);
+    letter-spacing: -0.01em;
+  }
+
+  .howto__step-text {
+    margin-top: var(--space-1);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+</style>

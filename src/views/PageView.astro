@@ -1,0 +1,151 @@
+---
+/** About / Privacy / Terms / Contact — content from Markdown in src/content/pages/<locale>/. */
+import { getEntry, render } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/seo/Breadcrumbs.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { brand } from '@/config/brand';
+import { LOCALE_META, type Locale } from '@/config/site';
+import { fmt, getDictionary } from '@/i18n';
+import { alternatesFor, pathFor, type StaticPageId } from '@/lib/routing';
+import { buildPageSeo } from '@/lib/seo/meta';
+import { breadcrumbSchema } from '@/lib/seo/schema';
+
+interface Props {
+  pageId: StaticPageId;
+  locale: Locale;
+}
+
+const { pageId, locale } = Astro.props;
+const t = getDictionary(locale);
+const copy = t.pages[pageId];
+const key = { kind: 'page', pageId } as const;
+const path = pathFor(key, locale);
+const entry = await getEntry('pages', `${locale}/${pageId}`);
+if (!entry) throw new Error(`Missing content: src/content/pages/${locale}/${pageId}.md`);
+const { Content } = await render(entry);
+const title = fmt(copy.title);
+const updated = entry.data.updated
+  ? new Intl.DateTimeFormat(LOCALE_META[locale].htmlLang, { dateStyle: 'long' }).format(entry.data.updated)
+  : null;
+
+const seo = buildPageSeo({
+  locale,
+  title: copy.seoTitle,
+  description: copy.seoDescription,
+  path,
+  alternates: alternatesFor(key),
+});
+const crumbs = [
+  { name: t.nav.home, path: pathFor({ kind: 'home' }, locale) },
+  { name: title, path },
+];
+const contact = pageId === 'contact' ? t.pages.contact : null;
+---
+
+<BaseLayout locale={locale} seo={seo} alternates={alternatesFor(key)} nav={{ section: 'page' }} jsonLd={[breadcrumbSchema(crumbs)]}>
+  <div class="container page">
+    <Breadcrumbs items={crumbs} locale={locale} />
+    <header class="page__head">
+      <h1>{title}</h1>
+      {updated && entry.data.showUpdated && <p class="page__updated">{fmt(t.pages.updated, { date: updated })}</p>}
+    </header>
+
+    {
+      contact && (
+        <div class="contact-cards">
+          <a class="contact-card" href={`mailto:${brand.supportEmail}`}>
+            <Icon name="mail" />
+            <span>
+              <span class="contact-card__label">{contact.emailLabel}</span>
+              <span class="contact-card__value">{brand.supportEmail}</span>
+            </span>
+          </a>
+          <a class="contact-card" href={brand.companyUrl} target="_blank" rel="noopener">
+            <Icon name="external" />
+            <span>
+              <span class="contact-card__label">{contact.companyLabel}</span>
+              <span class="contact-card__value">{brand.companyUrl.replace(/^https?:\/\//, '')}</span>
+            </span>
+            <span class="visually-hidden">{t.a11y.opensInNewTab}</span>
+          </a>
+        </div>
+      )
+    }
+
+    <article class="prose">
+      <Content />
+    </article>
+  </div>
+</BaseLayout>
+
+<style>
+  .page {
+    padding-top: var(--space-4);
+  }
+
+  .page__head {
+    margin-block: var(--space-6) var(--space-8);
+  }
+
+  .page__head h1 {
+    font-size: var(--text-4xl);
+    letter-spacing: var(--tracking-tighter);
+    line-height: var(--leading-tight);
+  }
+
+  .page__updated {
+    margin-top: var(--space-3);
+    color: var(--color-text-subtle);
+    font-size: var(--text-sm);
+  }
+
+  .contact-cards {
+    display: grid;
+    gap: var(--space-3);
+    max-width: var(--container-prose);
+    margin-bottom: var(--space-8);
+  }
+
+  .contact-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-5);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .contact-card:hover {
+    border-color: var(--color-accent-border);
+    color: var(--color-text);
+  }
+
+  .contact-card > .icon {
+    color: var(--color-accent-text);
+  }
+
+  .contact-card > span {
+    display: grid;
+    min-width: 0;
+  }
+
+  .contact-card__label {
+    color: var(--color-text-subtle);
+    font-size: var(--text-xs);
+  }
+
+  .contact-card__value {
+    overflow-wrap: anywhere;
+    font-weight: var(--weight-medium);
+  }
+
+  @media (min-width: 640px) {
+    .contact-cards {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+</style>

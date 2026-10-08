@@ -1,0 +1,126 @@
+---
+/** Global search dialog (Ctrl/⌘ + K, "/" or the header search button). */
+import type { Locale } from '@/config/site';
+import { getDictionary } from '@/i18n';
+import { pathFor } from '@/lib/routing';
+import Icon from '@/components/ui/Icon.astro';
+import SearchBox from './SearchBox.astro';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = getDictionary(locale);
+---
+
+<dialog id="search-dialog" class="search-dialog" aria-label={t.search.label} data-dialog data-search-dialog>
+  <div class="search-dialog__panel">
+    <div class="search-dialog__top">
+      <SearchBox locale={locale} id="dialog-search" variant="dialog" />
+      <button type="button" class="btn btn--ghost btn--icon search-dialog__close" data-dialog-close aria-label={t.search.close}>
+        <Icon name="close" />
+      </button>
+    </div>
+    <a class="search-dialog__all" href={pathFor({ kind: 'tools' }, locale)}>
+      {t.search.browseAll}
+      <Icon name="arrow-right" />
+    </a>
+  </div>
+</dialog>
+
+<style>
+  .search-dialog {
+    width: min(100% - 2 * var(--space-4), 40rem);
+    max-width: none;
+    max-height: calc(100dvh - 2 * var(--space-4));
+    margin: clamp(var(--space-4), 10vh, 7rem) auto auto;
+    padding: 0;
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-xl);
+    background: var(--color-surface);
+    color: var(--color-text);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+  }
+
+  .search-dialog::backdrop {
+    background: var(--color-overlay);
+    backdrop-filter: blur(3px);
+  }
+
+  .search-dialog[open] {
+    animation: dialog-in var(--duration-base) var(--ease-out);
+  }
+
+  @keyframes dialog-in {
+    from {
+      opacity: 0;
+      transform: translateY(-8px) scale(0.985);
+    }
+  }
+
+  .search-dialog__top {
+    position: relative;
+  }
+
+  .search-dialog__close {
+    position: absolute;
+    top: var(--space-2);
+    right: var(--space-2);
+  }
+
+  .search-dialog__top :global(.nx-search__input) {
+    padding-right: calc(var(--tap-target) + var(--space-3));
+  }
+
+  .search-dialog__all {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 48px;
+    padding: 0 var(--space-5);
+    border-top: 1px solid var(--color-border-subtle);
+    background: var(--color-surface-2);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    text-decoration: none;
+  }
+
+  .search-dialog__all:hover {
+    color: var(--color-text);
+  }
+
+  @media (max-width: 599px) {
+    .search-dialog {
+      width: 100%;
+      max-height: 100dvh;
+      height: 100dvh;
+      margin: 0;
+      border: 0;
+      border-radius: 0;
+    }
+
+    .search-dialog__panel {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .search-dialog__top {
+      flex: 1;
+      min-height: 0;
+    }
+
+    .search-dialog__top :global(.nx-search) {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .search-dialog__top :global(.nx-search__panel) {
+      flex: 1;
+      max-height: none;
+    }
+  }
+</style>

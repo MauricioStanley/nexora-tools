@@ -1,0 +1,235 @@
+---
+import type { Locale } from '@/config/site';
+import { getCategory } from '@/data/categories';
+import { getDictionary } from '@/i18n';
+import { pathFor } from '@/lib/routing';
+import type { Tool } from '@/tools/types';
+import Icon from '@/components/ui/Icon.astro';
+
+interface Props {
+  tool: Tool;
+  locale: Locale;
+  headingLevel?: 'h2' | 'h3';
+  /** Marks the link for `related_tool_clicked` analytics. */
+  relatedSource?: string;
+  showCategory?: boolean;
+}
+
+const { tool, locale, headingLevel = 'h3', relatedSource, showCategory = false } = Astro.props;
+const t = getDictionary(locale);
+const content = tool.content[locale];
+const category = getCategory(tool.category);
+const Heading = headingLevel;
+const href = pathFor({ kind: 'tool', toolId: tool.id }, locale);
+---
+
+<article class="tool-card" data-tool-card={tool.id} data-hue={category.hue}>
+  <div class="tool-card__top">
+    <span class="tool-card__icon">
+      <Icon name={tool.icon} />
+    </span>
+    {showCategory && <span class="tool-card__category">{category.content[locale].shortName}</span>}
+  </div>
+  <Heading class="tool-card__title">
+    <a
+      class="tool-card__link"
+      href={href}
+      data-astro-prefetch
+      data-related-tool={relatedSource ? tool.id : undefined}
+      data-related-source={relatedSource}
+    >
+      {content.name}
+    </a>
+  </Heading>
+  <p class="tool-card__desc">{content.tagline}</p>
+  <div class="tool-card__foot">
+    {
+      tool.executionMode === 'client' && (
+        <span class="tool-card__badge">
+          <Icon name="lock" />
+          {t.privacy.client.label}
+        </span>
+      )
+    }
+    {tool.status === 'beta' && <span class="chip">{t.common.beta}</span>}
+    <Icon name="arrow-right" class="tool-card__arrow" />
+  </div>
+</article>
+
+<style>
+  .tool-card {
+    --hue: var(--color-accent-text);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    min-width: 0;
+    height: 100%;
+    padding: var(--space-5);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    box-shadow: var(--highlight);
+    transition: border-color var(--duration-base) var(--ease-standard), transform var(--duration-base) var(--ease-out),
+      background-color var(--duration-base) var(--ease-standard);
+  }
+
+  .tool-card[data-hue='rose'] { --hue: var(--hue-rose); }
+  .tool-card[data-hue='violet'] { --hue: var(--hue-violet); }
+  .tool-card[data-hue='emerald'] { --hue: var(--hue-emerald); }
+
+  .tool-card:hover {
+    border-color: var(--color-border-strong);
+    background: var(--color-surface-2);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .tool-card:hover {
+      transform: translateY(-2px);
+    }
+  }
+
+  .tool-card:focus-within {
+    border-color: var(--color-accent-border);
+  }
+
+  .tool-card__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-2);
+  }
+
+  .tool-card__icon {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: color-mix(in srgb, var(--hue) 9%, var(--color-surface-2));
+    color: var(--hue);
+  }
+
+  .tool-card__icon .icon {
+    width: 1.3rem;
+    height: 1.3rem;
+  }
+
+  .tool-card__category {
+    color: var(--color-text-subtle);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-medium);
+  }
+
+  .tool-card__title {
+    font-size: var(--text-lg);
+    letter-spacing: -0.015em;
+  }
+
+  .tool-card__link {
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .tool-card__link:hover {
+    color: var(--color-text);
+  }
+
+  /* Stretched link: the whole card is clickable, with a single accessible link. */
+  .tool-card__link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+  }
+
+  .tool-card__link:focus-visible {
+    outline: none;
+  }
+
+  .tool-card__link:focus-visible::after {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+
+  .tool-card__desc {
+    flex: 1;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    line-height: var(--leading-normal);
+  }
+
+  .tool-card__foot {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+  }
+
+  .tool-card__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    color: var(--color-text-subtle);
+    font-size: var(--text-xs);
+  }
+
+  .tool-card__badge .icon {
+    width: 0.8rem;
+    height: 0.8rem;
+    color: var(--color-success);
+  }
+
+  .tool-card__arrow {
+    margin-left: auto;
+    width: 1.1rem;
+    height: 1.1rem;
+    color: var(--color-text-subtle);
+    transition: transform var(--duration-base) var(--ease-out), color var(--duration-base) var(--ease-standard);
+  }
+
+  .tool-card:hover .tool-card__arrow {
+    color: var(--color-accent-text);
+    transform: translateX(3px);
+  }
+
+  /* Phones: compact horizontal card (icon | text) so lists don't become endless scrolls. */
+  @media (max-width: 559px) {
+    .tool-card {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      grid-template-areas:
+        'icon title'
+        'icon desc'
+        'icon foot';
+      column-gap: var(--space-4);
+      row-gap: var(--space-1);
+      padding: var(--space-4);
+    }
+
+    .tool-card__top {
+      grid-area: icon;
+      align-self: start;
+      margin: 0;
+    }
+
+    .tool-card__category {
+      display: none;
+    }
+
+    .tool-card__title {
+      grid-area: title;
+      font-size: var(--text-md);
+    }
+
+    .tool-card__desc {
+      grid-area: desc;
+    }
+
+    .tool-card__foot {
+      grid-area: foot;
+      margin-top: var(--space-1);
+    }
+  }
+</style>

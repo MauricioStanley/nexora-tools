@@ -1,0 +1,251 @@
+---
+/**
+ * Mobile navigation sheet built on the native <dialog> element: focus trapping, Escape to
+ * close and inert background come from the browser. Opened by [data-menu-open].
+ */
+import { featureFlags } from '@/config/features';
+import type { Locale } from '@/config/site';
+import { getCategories } from '@/data/categories';
+import { getDictionary } from '@/i18n';
+import { pathFor } from '@/lib/routing';
+import { getToolsByCategory } from '@/tools/registry';
+import Icon from '@/components/ui/Icon.astro';
+import Logo from '@/components/ui/Logo.astro';
+import LanguageSwitcher from './LanguageSwitcher.astro';
+import ThemeToggle from './ThemeToggle.astro';
+
+interface Props {
+  locale: Locale;
+  alternates: Record<Locale, string> | null;
+}
+
+const { locale, alternates } = Astro.props;
+const t = getDictionary(locale);
+const groups = getCategories().map((category) => ({
+  category,
+  tools: getToolsByCategory(category.id),
+}));
+---
+
+<dialog id="mobile-nav" class="sheet" aria-label={t.a11y.mobileNav} data-dialog>
+  <div class="sheet__panel">
+    <div class="sheet__head">
+      <Logo locale={locale} id="mobile" showCompany={false} />
+      <button type="button" class="btn btn--ghost btn--icon" data-dialog-close aria-label={t.nav.closeMenu}>
+        <Icon name="close" />
+      </button>
+    </div>
+
+    <div class="sheet__body">
+      {
+        featureFlags.searchDialog && (
+          <button type="button" class="sheet__search" data-search-open aria-haspopup="dialog" aria-controls="search-dialog">
+            <Icon name="search" />
+            <span>{t.search.placeholder}</span>
+          </button>
+        )
+      }
+
+      <nav aria-label={t.a11y.mainNav}>
+        {
+          groups.map(({ category, tools }) => (
+            <section class="sheet__group">
+              <a class="sheet__group-title" href={pathFor({ kind: 'category', categoryId: category.id }, locale)}>
+                <span>{category.content[locale].shortName}</span>
+                <Icon name="chevron-right" />
+              </a>
+              <ul role="list" class="sheet__links">
+                {tools.map((tool) => (
+                  <li>
+                    <a class="sheet__link" href={pathFor({ kind: 'tool', toolId: tool.id }, locale)}>
+                      <span class="sheet__link-icon" data-hue={category.hue}>
+                        <Icon name={tool.icon} />
+                      </span>
+                      {tool.content[locale].name}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))
+        }
+        <a class="btn btn--secondary btn--block sheet__all" href={pathFor({ kind: 'tools' }, locale)}>
+          {t.nav.allTools}
+          <Icon name="arrow-right" />
+        </a>
+      </nav>
+
+      <div class="sheet__prefs">
+        <div class="sheet__pref">
+          <span class="sheet__pref-label">{t.language.label}</span>
+          <LanguageSwitcher locale={locale} alternates={alternates} variant="list" />
+        </div>
+        {
+          featureFlags.themeSwitcher && (
+            <div class="sheet__pref sheet__pref--row">
+              <span class="sheet__pref-label">{t.theme.label}</span>
+              <ThemeToggle locale={locale} />
+            </div>
+          )
+        }
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<style>
+  .sheet {
+    width: 100%;
+    max-width: 100%;
+    height: 100dvh;
+    max-height: 100dvh;
+    margin: 0 0 0 auto;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--color-text);
+  }
+
+  .sheet::backdrop {
+    background: var(--color-overlay);
+    backdrop-filter: blur(2px);
+  }
+
+  .sheet__panel {
+    display: flex;
+    flex-direction: column;
+    width: min(100%, 26rem);
+    height: 100%;
+    margin-left: auto;
+    border-left: 1px solid var(--color-border);
+    background: var(--color-bg);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .sheet[open] .sheet__panel {
+    animation: sheet-in var(--duration-slow) var(--ease-out);
+  }
+
+  @keyframes sheet-in {
+    from {
+      transform: translateX(24px);
+      opacity: 0;
+    }
+  }
+
+  .sheet__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--header-height);
+    padding: 0 var(--space-4);
+    border-bottom: 1px solid var(--color-border-subtle);
+  }
+
+  .sheet__body {
+    flex: 1;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: var(--space-4) var(--space-4) calc(var(--space-8) + env(safe-area-inset-bottom));
+  }
+
+  .sheet__search {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    width: 100%;
+    min-height: 48px;
+    padding: 0 var(--space-4);
+    margin-bottom: var(--space-6);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    text-align: left;
+  }
+
+  .sheet__group + .sheet__group {
+    margin-top: var(--space-5);
+  }
+
+  .sheet__group-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 40px;
+    color: var(--color-text-subtle);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    text-decoration: none;
+  }
+
+  .sheet__links {
+    display: grid;
+    gap: 2px;
+  }
+
+  .sheet__link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-height: 48px;
+    padding: 0 var(--space-2);
+    border-radius: var(--radius-md);
+    color: var(--color-text);
+    font-weight: var(--weight-medium);
+    text-decoration: none;
+  }
+
+  .sheet__link:hover,
+  .sheet__link:focus-visible {
+    background: var(--color-surface-2);
+    color: var(--color-text);
+  }
+
+  .sheet__link-icon {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-2);
+    color: var(--hue, var(--color-accent-text));
+  }
+
+  .sheet__link-icon[data-hue='rose'] { --hue: var(--hue-rose); }
+  .sheet__link-icon[data-hue='violet'] { --hue: var(--hue-violet); }
+  .sheet__link-icon[data-hue='emerald'] { --hue: var(--hue-emerald); }
+
+  .sheet__all {
+    margin-top: var(--space-6);
+  }
+
+  .sheet__prefs {
+    display: grid;
+    gap: var(--space-5);
+    margin-top: var(--space-8);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--color-border-subtle);
+  }
+
+  .sheet__pref {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .sheet__pref--row {
+    grid-auto-flow: column;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .sheet__pref-label {
+    color: var(--color-text-subtle);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+  }
+</style>

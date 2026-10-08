@@ -1,0 +1,112 @@
+---
+/**
+ * Root "/" — language gateway (x-default).
+ * 1. A stored explicit choice wins. 2. Otherwise the browser language (es → Spanish,
+ * anything else → English). The redirect uses location.replace, so the root never enters
+ * history and cannot loop: localized pages never redirect back here.
+ * Without JavaScript the page offers both languages as plain links.
+ */
+import '@/styles/fonts.css';
+import '@/styles/tokens.css';
+import '@/styles/base.css';
+import { brand } from '@/config/brand';
+import { DEFAULT_LOCALE, DEFAULT_THEME, LOCALE_META, LOCALES, STORAGE_KEYS } from '@/config/site';
+import { fmt, getDictionary } from '@/i18n';
+import { absoluteUrl, pathFor } from '@/lib/routing';
+import { buildAlternates } from '@/lib/seo/meta';
+import LogoMark from '@/components/ui/LogoMark.astro';
+
+const en = getDictionary('en');
+const es = getDictionary('es');
+const paths = Object.fromEntries(LOCALES.map((l) => [l, pathFor({ kind: 'home' }, l)])) as Record<(typeof LOCALES)[number], string>;
+const alternates = buildAlternates(paths, { xDefaultPath: '/' });
+// Bilingual gateway copy (distinct from /en/ and /es/ to avoid duplicate metadata).
+const title = `${brand.relationship} · ${en.root.title} / ${es.root.title}`;
+const description = `${fmt(en.footer.tagline)} ${fmt(es.footer.tagline)}`;
+const config = { key: STORAGE_KEYS.locale, locales: LOCALES, fallback: DEFAULT_LOCALE, paths };
+---
+
+<!doctype html>
+<html lang="en" data-theme={DEFAULT_THEME}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline define:vars={{ config }}>
+      (function () {
+        var target = null;
+        try {
+          var stored = localStorage.getItem(config.key);
+          if (stored && config.locales.indexOf(stored) !== -1) target = stored;
+        } catch (e) {}
+        if (!target) {
+          var langs = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || ''];
+          for (var i = 0; i < langs.length && !target; i++) {
+            var base = String(langs[i]).toLowerCase().split(/[-_]/)[0];
+            if (config.locales.indexOf(base) !== -1) target = base;
+          }
+        }
+        location.replace(config.paths[target || config.fallback]);
+      })();
+    </script>
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={absoluteUrl('/')} />
+    {alternates.map((alt) => <link rel="alternate" hreflang={alt.hreflang} href={alt.href} />)}
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={brand.productName} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={absoluteUrl('/')} />
+    <meta property="og:image" content={absoluteUrl(brand.assets.ogImage.en)} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href={brand.assets.favicon} type="image/svg+xml" />
+    <meta name="theme-color" content={brand.themeColor.dark} />
+  </head>
+  <body>
+    <main class="gate">
+      <LogoMark id="gate" size={48} />
+      <h1 class="gate__title">{brand.productName}</h1>
+      <p class="gate__tag">{en.footer.tagline}</p>
+      <ul class="gate__choices" role="list">
+        {
+          LOCALES.map((l) => (
+            <li>
+              <a class="btn btn--secondary btn--lg" href={paths[l]} hreflang={l} lang={LOCALE_META[l].htmlLang}>
+                {getDictionary(l).root.continue}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </main>
+  </body>
+</html>
+
+<style>
+  .gate {
+    display: grid;
+    justify-items: center;
+    align-content: center;
+    gap: var(--space-4);
+    min-height: 100dvh;
+    padding: var(--space-8) var(--gutter);
+    text-align: center;
+  }
+
+  .gate__title {
+    font-size: var(--text-3xl);
+    letter-spacing: var(--tracking-tighter);
+  }
+
+  .gate__tag {
+    color: var(--color-text-muted);
+  }
+
+  .gate__choices {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+  }
+</style>

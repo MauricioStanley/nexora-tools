@@ -1,0 +1,124 @@
+/* Mobile order: content → preview → design. Desktop: two columns, preview sticky on the right. */
+.layout {
+  display: grid;
+  grid-template-areas:
+    'content'
+    'preview'
+    'design';
+  gap: var(--space-5);
+}
+
+.content {
+  grid-area: content;
+  min-width: 0;
+}
+
+.designArea {
+  grid-area: design;
+  min-width: 0;
+}
+
+.design {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.colors {
+  display: grid;
+  gap: var(--space-4);
+}
+
+@media (min-width: 480px) {
+  .colors {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.previewCol {
+  grid-area: preview;
+  display: grid;
+  align-content: start;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.preview {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  width: 100%;
+  max-width: 22rem;
+  margin-inline: auto;
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background:
+    linear-gradient(45deg, var(--color-surface-3) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--color-surface-3) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--color-surface-3) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--color-surface-3) 75%),
+    var(--color-surface-2);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+}
+
+.preview svg {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+}
+
+.empty {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  max-width: 14rem;
+  color: var(--color-text-subtle);
+  font-size: var(--text-sm);
+  text-align: center;
+}
+
+.empty :global(.icon) {
+  width: 2.5rem;
+  height: 2.5rem;
+  opacity: 0.6;
+}
+
+.downloads {
+  display: grid;
+  gap: var(--space-2);
+}
+
+@media (min-width: 480px) {
+  .downloads {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.downloads :global(.btn[aria-disabled='true']) {
+  pointer-events: none;
+}
+
+.tip {
+  color: var(--color-text-subtle);
+  font-size: var(--text-xs);
+  text-align: center;
+}
+
+@media (min-width: 900px) {
+  .layout {
+    grid-template-columns: minmax(0, 1.2fr) minmax(18rem, 1fr);
+    grid-template-areas:
+      'content preview'
+      'design preview';
+    grid-template-rows: auto 1fr;
+    align-items: start;
+  }
+
+  .previewCol {
+    align-self: start;
+    position: sticky;
+    top: calc(var(--header-height) + var(--space-4));
+  }
+}

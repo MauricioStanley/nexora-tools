@@ -1,0 +1,163 @@
+---
+/**
+ * Language switcher. Links point to the *same page* in the other locale (not the home page),
+ * are crawlable, and store the visitor's explicit choice (see src/scripts/site.ts).
+ * Rendered as a disclosure (<details>) so it works without JavaScript and scales to more locales.
+ */
+import { LOCALE_META, LOCALES, type Locale } from '@/config/site';
+import { fmt, getDictionary } from '@/i18n';
+import { pathFor } from '@/lib/routing';
+import Icon from '@/components/ui/Icon.astro';
+
+interface Props {
+  locale: Locale;
+  alternates: Record<Locale, string> | null;
+  variant?: 'menu' | 'list';
+}
+
+const { locale, alternates, variant = 'menu' } = Astro.props;
+const t = getDictionary(locale);
+const hrefFor = (l: Locale) => alternates?.[l] ?? pathFor({ kind: 'home' }, l);
+---
+
+{
+  variant === 'menu' ? (
+    <details class="lang" data-dropdown>
+      <summary class="btn btn--ghost btn--sm lang__trigger" aria-label={fmt(t.language.current, { language: LOCALE_META[locale].nativeLabel })}>
+        <Icon name="globe" />
+        <span class="lang__code">{locale.toUpperCase()}</span>
+        <Icon name="chevron-down" class="lang__chevron" />
+      </summary>
+      <ul class="lang__menu" role="list">
+        {LOCALES.map((l) => (
+          <li>
+            <a
+              class="lang__option"
+              href={hrefFor(l)}
+              hreflang={LOCALE_META[l].htmlLang}
+              lang={LOCALE_META[l].htmlLang}
+              aria-current={l === locale ? 'true' : undefined}
+              data-locale-switch={l}
+            >
+              <span>{LOCALE_META[l].nativeLabel}</span>
+              {l === locale && <Icon name="check" />}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </details>
+  ) : (
+    <ul class="lang-list" role="list" aria-label={t.language.label}>
+      {LOCALES.map((l) => (
+        <li>
+          <a
+            class="lang-list__option"
+            href={hrefFor(l)}
+            hreflang={LOCALE_META[l].htmlLang}
+            lang={LOCALE_META[l].htmlLang}
+            aria-current={l === locale ? 'true' : undefined}
+            data-locale-switch={l}
+          >
+            {LOCALE_META[l].nativeLabel}
+          </a>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+<style>
+  .lang {
+    position: relative;
+  }
+
+  .lang__trigger {
+    list-style: none;
+    gap: var(--space-1);
+    padding-inline: var(--space-2);
+  }
+
+  .lang__trigger::-webkit-details-marker {
+    display: none;
+  }
+
+  .lang__code {
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    letter-spacing: 0.04em;
+  }
+
+  .lang__chevron {
+    width: 0.875rem;
+    height: 0.875rem;
+    transition: transform var(--duration-fast) var(--ease-standard);
+  }
+
+  .lang[open] .lang__chevron {
+    transform: rotate(180deg);
+  }
+
+  .lang__menu {
+    position: absolute;
+    right: 0;
+    top: calc(100% + var(--space-2));
+    z-index: var(--z-dropdown);
+    min-width: 11rem;
+    padding: var(--space-1);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .lang__option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    min-height: 40px;
+    padding: 0 var(--space-3);
+    border-radius: var(--radius-sm);
+    color: var(--color-text);
+    font-size: var(--text-sm);
+    text-decoration: none;
+  }
+
+  .lang__option:hover {
+    background: var(--color-surface-2);
+    color: var(--color-text);
+  }
+
+  .lang__option[aria-current='true'] {
+    color: var(--color-accent-text);
+  }
+
+  .lang-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .lang-list__option {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+    padding: 0 var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    text-decoration: none;
+  }
+
+  .lang-list__option:hover {
+    color: var(--color-text);
+    border-color: var(--color-border-strong);
+  }
+
+  .lang-list__option[aria-current='true'] {
+    border-color: var(--color-accent-border);
+    background: var(--color-accent-soft);
+    color: var(--color-accent-text);
+  }
+</style>

@@ -1,0 +1,109 @@
+.shell {
+  position: relative;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-lg), var(--highlight);
+}
+
+.shell::before {
+  /* Hairline accent along the top edge. */
+  content: '';
+  position: absolute;
+  inset: -1px 12% auto;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-accent-border), transparent);
+  pointer-events: none;
+}
+
+.body {
+  padding: var(--space-3);
+}
+
+@media (min-width: 640px) {
+  .body {
+    padding: var(--space-5);
+  }
+}
+
+.workspace {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.main {
+  display: grid;
+  align-content: start;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.side {
+  display: grid;
+  align-content: start;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+@media (min-width: 900px) {
+  .workspace[data-layout='split'] {
+    grid-template-columns: minmax(0, 1.35fr) minmax(18rem, 1fr);
+    align-items: start;
+  }
+
+  .workspace[data-layout='split'] .side {
+    position: sticky;
+    top: calc(var(--header-height) + var(--space-4));
+  }
+}
+
+.panel {
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-2);
+}
+
+.panelTitle {
+  margin-bottom: var(--space-4);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0;
+}
+
+.actionBar {
+  display: grid;
+  gap: var(--space-2);
+}
+
+/* On small screens keep the primary action reachable while scrolling long file lists. */
+@media (max-width: 899px) {
+  .actionBar[data-sticky='true'] {
+    position: sticky;
+    bottom: 0;
+    z-index: var(--z-raised);
+    margin-inline: calc(var(--space-3) * -1);
+    margin-bottom: calc(var(--space-3) * -1);
+    padding: var(--space-3);
+    padding-bottom: calc(var(--space-3) + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--color-border);
+    border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+    background: color-mix(in srgb, var(--color-surface) 92%, transparent);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+}
+
+@media (min-width: 640px) and (max-width: 899px) {
+  .actionBar[data-sticky='true'] {
+    margin-inline: calc(var(--space-5) * -1);
+    margin-bottom: calc(var(--space-5) * -1);
+    padding-inline: var(--space-5);
+  }
+}
+
+.actionHint {
+  color: var(--color-text-subtle);
+  font-size: var(--text-xs);
+  text-align: center;
+}

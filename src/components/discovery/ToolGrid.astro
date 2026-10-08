@@ -1,0 +1,52 @@
+---
+import type { Locale } from '@/config/site';
+import type { Tool } from '@/tools/types';
+import ToolCard from './ToolCard.astro';
+
+interface Props {
+  tools: readonly Tool[];
+  locale: Locale;
+  headingLevel?: 'h2' | 'h3';
+  relatedSource?: string;
+  showCategory?: boolean;
+  columns?: 2 | 3 | 4;
+  label?: string;
+}
+
+const { tools, locale, headingLevel, relatedSource, showCategory, columns = 3, label } = Astro.props;
+---
+
+<ul class="tool-grid" data-columns={columns} role="list" aria-label={label} data-tool-grid>
+  {
+    tools.map((tool) => (
+      <li data-tool-item={tool.id}>
+        <ToolCard tool={tool} locale={locale} headingLevel={headingLevel} relatedSource={relatedSource} showCategory={showCategory} />
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .tool-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-3);
+  }
+
+  @media (min-width: 560px) {
+    .tool-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-4);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .tool-grid[data-columns='3'] {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .tool-grid[data-columns='4'] {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+</style>

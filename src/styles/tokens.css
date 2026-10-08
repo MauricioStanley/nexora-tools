@@ -1,0 +1,212 @@
+/*
+ * Nexora design tokens.
+ * Every color, space, radius, shadow, type size, duration and z-index in the product comes
+ * from here. Components never hardcode raw values. See docs/DESIGN_SYSTEM.md.
+ */
+
+:root {
+  /* ── Typography ─────────────────────────────────────────────── */
+  --font-sans: 'Geist Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', 'JetBrains Mono', Menlo, Consolas, monospace;
+
+  --text-2xs: 0.6875rem;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-md: 1.0625rem;
+  --text-lg: 1.1875rem;
+  --text-xl: 1.3125rem;
+  --text-2xl: clamp(1.375rem, 1.2rem + 0.8vw, 1.625rem);
+  --text-3xl: clamp(1.625rem, 1.3rem + 1.5vw, 2.125rem);
+  --text-4xl: clamp(2rem, 1.45rem + 2.6vw, 2.875rem);
+  --text-display: clamp(2.25rem, 1.35rem + 4.2vw, 4rem);
+
+  --leading-none: 1;
+  --leading-tight: 1.08;
+  --leading-snug: 1.25;
+  --leading-normal: 1.55;
+  --leading-relaxed: 1.7;
+
+  --tracking-tighter: -0.035em;
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.08em;
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 680;
+
+  /* ── Spacing (4px grid) ─────────────────────────────────────── */
+  --space-0: 0;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+  --space-section: clamp(3.5rem, 2.25rem + 5vw, 6.5rem);
+  --gutter: clamp(1rem, 0.6rem + 2vw, 2rem);
+
+  /* ── Layout ─────────────────────────────────────────────────── */
+  --container: 74rem;
+  --container-narrow: 48rem;
+  --container-prose: 42rem;
+  --header-height: 64px;
+  --tap-target: 44px;
+
+  /* Breakpoints (reference values; media queries use the literals below)
+     sm 480px · md 768px · lg 1024px · xl 1280px */
+
+  /* ── Radius ─────────────────────────────────────────────────── */
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 22px;
+  --radius-full: 999px;
+
+  /* ── Motion ─────────────────────────────────────────────────── */
+  --duration-instant: 80ms;
+  --duration-fast: 140ms;
+  --duration-base: 220ms;
+  --duration-slow: 360ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ── Layers ─────────────────────────────────────────────────── */
+  --z-base: 0;
+  --z-raised: 10;
+  --z-sticky: 100;
+  --z-header: 200;
+  --z-dropdown: 300;
+  --z-overlay: 400;
+  --z-modal: 500;
+  --z-toast: 600;
+}
+
+/* ── Dark theme (default brand experience) ───────────────────── */
+:root,
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --color-bg: #0a0c0f;
+  --color-bg-subtle: #0d1014;
+  --color-surface: #12161b;
+  --color-surface-2: #171c22;
+  --color-surface-3: #1f252d;
+  --color-surface-inset: #0e1115;
+  --color-overlay: rgba(4, 6, 8, 0.72);
+
+  --color-border-subtle: #1a2027;
+  --color-border: #242b34;
+  --color-border-strong: #333c48;
+
+  --color-text: #edf1f5;
+  --color-text-muted: #a3adba;
+  --color-text-subtle: #808b99;
+  --color-text-inverse: #0a0c0f;
+
+  --color-accent: #38d7f5;
+  --color-accent-strong: #74e6fb;
+  --color-accent-contrast: #03151b;
+  --color-accent-text: #5fe0f8;
+  --color-accent-soft: rgba(56, 215, 245, 0.1);
+  --color-accent-border: rgba(56, 215, 245, 0.34);
+  --color-accent-2: #5b8cff;
+
+  --color-success: #3ddc97;
+  --color-success-soft: rgba(61, 220, 151, 0.1);
+  --color-success-border: rgba(61, 220, 151, 0.32);
+  --color-warning: #f5b841;
+  --color-warning-soft: rgba(245, 184, 65, 0.1);
+  --color-warning-border: rgba(245, 184, 65, 0.32);
+  --color-error: #ff7070;
+  --color-error-soft: rgba(255, 112, 112, 0.1);
+  --color-error-border: rgba(255, 112, 112, 0.34);
+
+  --color-focus: #74e6fb;
+
+  --hue-rose: #ff8f80;
+  --hue-violet: #ab9dff;
+  --hue-emerald: #52dca8;
+  --hue-cyan: #38d7f5;
+  --hue-amber: #f5b841;
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-sm: 0 2px 8px -2px rgba(0, 0, 0, 0.45);
+  --shadow-md: 0 10px 30px -12px rgba(0, 0, 0, 0.6), 0 2px 8px -2px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 30px 70px -24px rgba(0, 0, 0, 0.75), 0 10px 24px -12px rgba(0, 0, 0, 0.5);
+  --shadow-accent: 0 12px 36px -14px rgba(56, 215, 245, 0.45);
+  --highlight: inset 0 1px 0 rgba(255, 255, 255, 0.045);
+
+  --grid-line: rgba(255, 255, 255, 0.04);
+  --glow-accent: rgba(56, 215, 245, 0.14);
+  --glow-accent-2: rgba(91, 140, 255, 0.1);
+}
+
+/* ── Light theme ─────────────────────────────────────────────── */
+:root[data-theme='light'] {
+  color-scheme: light;
+
+  --color-bg: #f6f7f9;
+  --color-bg-subtle: #eef1f4;
+  --color-surface: #ffffff;
+  --color-surface-2: #f8f9fb;
+  --color-surface-3: #eef1f5;
+  --color-surface-inset: #f2f4f7;
+  --color-overlay: rgba(14, 18, 24, 0.45);
+
+  --color-border-subtle: #edf0f3;
+  --color-border: #e0e5ea;
+  --color-border-strong: #c9d0d8;
+
+  --color-text: #0d1117;
+  --color-text-muted: #47515e;
+  --color-text-subtle: #5d6776;
+  --color-text-inverse: #ffffff;
+
+  --color-accent: #0a7aa0;
+  --color-accent-strong: #08678a;
+  --color-accent-contrast: #ffffff;
+  --color-accent-text: #08698c;
+  --color-accent-soft: rgba(10, 122, 160, 0.08);
+  --color-accent-border: rgba(10, 122, 160, 0.32);
+  --color-accent-2: #3563e9;
+
+  --color-success: #0c7f56;
+  --color-success-soft: rgba(12, 127, 86, 0.08);
+  --color-success-border: rgba(12, 127, 86, 0.3);
+  --color-warning: #955900;
+  --color-warning-soft: rgba(196, 124, 0, 0.1);
+  --color-warning-border: rgba(196, 124, 0, 0.32);
+  --color-error: #c53030;
+  --color-error-soft: rgba(197, 48, 48, 0.07);
+  --color-error-border: rgba(197, 48, 48, 0.3);
+
+  --color-focus: #0a7aa0;
+
+  --hue-rose: #d9503f;
+  --hue-violet: #6a52e0;
+  --hue-emerald: #0f8a60;
+  --hue-cyan: #0a7aa0;
+  --hue-amber: #a86400;
+
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --shadow-sm: 0 2px 8px -2px rgba(15, 23, 42, 0.08);
+  --shadow-md: 0 12px 30px -14px rgba(15, 23, 42, 0.18), 0 2px 6px -2px rgba(15, 23, 42, 0.06);
+  --shadow-lg: 0 30px 60px -28px rgba(15, 23, 42, 0.28), 0 8px 20px -10px rgba(15, 23, 42, 0.1);
+  --shadow-accent: 0 12px 30px -14px rgba(10, 122, 160, 0.4);
+  --highlight: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+
+  --grid-line: rgba(13, 17, 23, 0.05);
+  --glow-accent: rgba(10, 122, 160, 0.08);
+  --glow-accent-2: rgba(53, 99, 233, 0.06);
+}
