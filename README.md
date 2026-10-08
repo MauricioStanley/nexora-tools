@@ -104,7 +104,6 @@ tests/                    Cross-cutting tests + fixtures
 - [PRIVACY_ARCHITECTURE.md](PRIVACY_ARCHITECTURE.md): what leaves the browser (nothing, for V1 tools)
 - [DEPLOYMENT.md](DEPLOYMENT.md): Cloudflare Pages setup and `tools.codywork.com`
 - [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md): visual language and design rationale
-- [ASTRA_HANDOFF.md](ASTRA_HANDOFF.md): audit handoff, known limitations and risks
 
 ## Quality gates (current state)
 

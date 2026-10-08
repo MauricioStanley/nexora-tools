@@ -91,4 +91,4 @@ Before any tool with `executionMode` `server`/`hybrid` ships:
 
 ## 9. Legal review
 
-The Privacy Policy and Terms in `src/content/pages/` are accurate descriptions of this implementation, written for plain-language clarity. **They must be reviewed by legal counsel** (company details, jurisdiction, GDPR/LGPD/CCPA specifics, children's policy) before launch. See ASTRA_HANDOFF.md.
+The Privacy Policy and Terms in `src/content/pages/` are accurate descriptions of this implementation, written for plain-language clarity. **They must be reviewed by legal counsel** (company details, jurisdiction, GDPR/LGPD/CCPA specifics, children's policy) before launch.

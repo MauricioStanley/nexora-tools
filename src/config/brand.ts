@@ -21,7 +21,7 @@ export const brand = {
   companyUrl: 'https://codywork.com',
   /**
    * Public support address shown on the Contact page.
-   * ⚠️ Must be confirmed (mailbox must exist) before launch — see ASTRA_HANDOFF.md.
+   * ⚠️ Must be confirmed (mailbox must exist) before launch.
    */
   supportEmail: 'support@codywork.com',
   /** Year the product launched (copyright ranges). */

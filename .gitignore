@@ -27,3 +27,6 @@ Thumbs.db
 
 # cloudflare
 .wrangler/
+
+# internal docs (kept locally, not published)
+ASTRA_HANDOFF.md
