@@ -28,7 +28,7 @@ Set these in **Pages → Settings → Environment variables** (Production and, i
 
 | Variable | Production | Preview | Notes |
 | --- | --- | --- | --- |
-| `PUBLIC_SITE_URL` | *(unset)* → `https://tools.codywork.com` | *(unset)* | Canonicals always point to production; previews are `noindex` via `_headers`. |
+| `PUBLIC_SITE_URL` | *(unset)* → `https://nexora-tools.stanleycedillos1.workers.dev` | *(unset)* | Canonicals always point to production; previews are `noindex` via `_headers`. |
 | `PUBLIC_GA4_ID` | `G-XXXXXXX` when analytics is approved | *(unset)* | Empty = no analytics code at all. The CSP whitelists Google hosts only when this is set. |
 | `PUBLIC_GSC_VERIFICATION` | optional | *(unset)* | Prefer DNS verification. |
 | `NODE_VERSION` | `22.12.0` | `22.12.0` | Only if `.node-version` isn't picked up. |

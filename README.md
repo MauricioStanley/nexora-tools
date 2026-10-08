@@ -2,7 +2,7 @@
 
 **Fast, private tools for everyday files.** Nexora Tools is a collection of free online micro-tools (PDF, image and utility) where each tool is its own landing page and, whenever technically possible, files are processed **entirely in the visitor's browser**. Nothing is uploaded.
 
-- Production URL: `https://tools.codywork.com`
+- Production URL: `https://nexora-tools.stanleycedillos1.workers.dev`
 - Owner: [Codywork](https://codywork.com)
 - Languages: English (`/en/`) and Spanish (`/es/`)
 
@@ -66,7 +66,7 @@ All optional. See `.env.example`.
 
 | Variable | Purpose |
 | --- | --- |
-| `PUBLIC_SITE_URL` | Canonical origin (default `https://tools.codywork.com`). |
+| `PUBLIC_SITE_URL` | Canonical origin (default `https://nexora-tools.stanleycedillos1.workers.dev`). |
 | `PUBLIC_GA4_ID` | GA4 measurement ID. Empty = no analytics code is loaded at all. |
 | `PUBLIC_GSC_VERIFICATION` | Google Search Console meta verification token (DNS verification preferred). |
 

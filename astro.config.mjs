@@ -11,7 +11,7 @@ import { localized404 } from './integrations/localized-404.mjs';
 const env = loadEnv(process.env.NODE_ENV ?? 'production', process.cwd(), '');
 
 /** Canonical production origin. Override only for staging builds that must self-reference. */
-const SITE = (env.PUBLIC_SITE_URL || 'https://tools.codywork.com').replace(/\/+$/, '');
+const SITE = (env.PUBLIC_SITE_URL || 'https://nexora-tools.stanleycedillos1.workers.dev').replace(/\/+$/, '');
 const GA4_ID = (env.PUBLIC_GA4_ID || '').trim();
 
 /**
