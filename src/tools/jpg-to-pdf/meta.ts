@@ -20,7 +20,7 @@ const meta: ToolMeta = {
     allowPaste: true,
   },
   output: ['pdf'],
-  relatedToolIds: ['compress-pdf', 'merge-pdf', 'compress-image'],
+  relatedToolIds: ['compress-pdf', 'merge-pdf', 'compress-image', 'rotate-pdf'],
   premiumFeatures: ['largerFiles', 'batchProcessing'],
   slugs: { en: 'jpg-to-pdf', es: 'jpg-a-pdf' },
   dateModified: '2026-09-18',

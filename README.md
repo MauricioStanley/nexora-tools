@@ -6,7 +6,7 @@
 - Owner: [Codywork](https://codywork.com)
 - Languages: English (`/en/`) and Spanish (`/es/`)
 
-## V1 tools
+## Tools
 
 | Category | Tool | EN URL | ES URL | Runs |
 | --- | --- | --- | --- | --- |
@@ -15,13 +15,22 @@
 | PDF | Compress PDF | `/en/tools/pdf/compress-pdf/` | `/es/herramientas/pdf/comprimir-pdf/` | Worker + OffscreenCanvas; optional PDF.js raster mode |
 | PDF | JPG to PDF | `/en/tools/pdf/jpg-to-pdf/` | `/es/herramientas/pdf/jpg-a-pdf/` | Main thread prep + worker (pdf-lib) |
 | PDF | PDF to JPG | `/en/tools/pdf/pdf-to-jpg/` | `/es/herramientas/pdf/pdf-a-jpg/` | PDF.js (own worker) + canvas |
+| PDF | Rotate PDF | `/en/tools/pdf/rotate-pdf/` | `/es/herramientas/pdf/rotar-pdf/` | Worker (pdf-lib) |
+| PDF | Remove PDF Pages | `/en/tools/pdf/remove-pdf-pages/` | `/es/herramientas/pdf/eliminar-paginas-pdf/` | Worker (pdf-lib) |
+| PDF | Add Page Numbers | `/en/tools/pdf/add-page-numbers/` | `/es/herramientas/pdf/numerar-paginas-pdf/` | Worker (pdf-lib, standard font) |
+| PDF | Watermark PDF | `/en/tools/pdf/watermark-pdf/` | `/es/herramientas/pdf/marca-de-agua-pdf/` | Worker (pdf-lib, standard font) |
 | Image | Compress Image | `/en/tools/image/compress-image/` | `/es/herramientas/imagen/comprimir-imagen/` | Canvas encoders |
 | Image | Resize Image | `/en/tools/image/resize-image/` | `/es/herramientas/imagen/redimensionar-imagen/` | Canvas |
 | Image | WebP to JPG | `/en/tools/image/webp-to-jpg/` | `/es/herramientas/imagen/webp-a-jpg/` | Canvas |
+| Image | PNG to JPG | `/en/tools/image/png-to-jpg/` | `/es/herramientas/imagen/png-a-jpg/` | Canvas |
+| Image | JPG to PNG | `/en/tools/image/jpg-to-png/` | `/es/herramientas/imagen/jpg-a-png/` | Canvas |
 | Image | JPG / PNG to WebP | `/en/tools/image/to-webp/` | `/es/herramientas/imagen/a-webp/` | Canvas; WASM encoder fallback on Safari |
+| Image | Rotate Image | `/en/tools/image/rotate-image/` | `/es/herramientas/imagen/rotar-imagen/` | Canvas |
 | Utility | QR Code Generator | `/en/tools/utility/qr-code-generator/` | `/es/herramientas/utilidades/generador-qr/` | Pure JS (uqr) |
+| Utility | Password Generator | `/en/tools/utility/password-generator/` | `/es/herramientas/utilidades/generador-de-contrasenas/` | Web Crypto |
+| Utility | Word Counter | `/en/tools/utility/word-counter/` | `/es/herramientas/utilidades/contador-de-palabras/` | Intl.Segmenter |
 
-All 10 tools are `executionMode: 'client'`: no file data leaves the device.
+All 19 tools are `executionMode: 'client'`: no file or text data leaves the device.
 
 ## Tech stack
 
@@ -108,6 +117,6 @@ tests/                    Cross-cutting tests + fixtures
 ## Quality gates (current state)
 
 - `npm run check`: 0 errors, 0 warnings
-- `npm test`: 113 tests passing
-- `npm run build`: 42 pages
+- `npm test`: 175 tests passing
+- `npm run build`: 60 pages
 - `npm run audit:dist`: 0 errors

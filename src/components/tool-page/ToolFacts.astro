@@ -42,10 +42,14 @@ const maxFiles = Math.round(input.maxFiles * plan.fileCountMultiplier);
         </>
       )
     }
-    <div>
-      <dt>{t.toolPage.factsOutput}</dt>
-      <dd>{outputs}</dd>
-    </div>
+    {
+      outputs && (
+        <div>
+          <dt>{t.toolPage.factsOutput}</dt>
+          <dd>{outputs}</dd>
+        </div>
+      )
+    }
     <div>
       <dt>{t.toolPage.factsProcessing}</dt>
       <dd class:list={{ 'facts__local': tool.executionMode === 'client' }}>

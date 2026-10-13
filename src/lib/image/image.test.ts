@@ -2,6 +2,7 @@ import sharp from 'sharp';
 import { describe, expect, it } from 'vitest';
 import { readImageDimensions, readJpegInfo, readWebpInfo, stripJpegMetadata } from './headers';
 import { computeTargetSize, fitWithinLimits, proportionalSide } from './resize';
+import { applyTransform, cssTransform, isIdentityTransform, rotatedSize, type ImageTransform } from './transform';
 
 async function jpeg(width: number, height: number, orientation?: number): Promise<Uint8Array> {
   let pipeline = sharp({ create: { width, height, channels: 3, background: '#3366cc' } }).jpeg({ quality: 80 });
@@ -73,5 +74,52 @@ describe('resize geometry', () => {
     expect(fitted.width * fitted.height).toBeLessThanOrEqual(16_777_216);
     expect(Math.abs(fitted.width / fitted.height - 8064 / 6048)).toBeLessThan(0.01);
     expect(fitWithinLimits({ width: 100, height: 100 }, { maxSide: 8192, maxArea: 16_777_216 }).limited).toBe(false);
+  });
+});
+
+describe('image transform', () => {
+  /** Minimal 2D context that tracks the current transform like a canvas does. */
+  function fakeContext() {
+    let m = [1, 0, 0, 1, 0, 0];
+    const mul = (n: number[]) => {
+      const [a, b, c, d, e, f] = m as [number, number, number, number, number, number];
+      const [a2, b2, c2, d2, e2, f2] = n as [number, number, number, number, number, number];
+      m = [a * a2 + c * b2, b * a2 + d * b2, a * c2 + c * d2, b * c2 + d * d2, a * e2 + c * f2 + e, b * e2 + d * f2 + f];
+    };
+    const ctx = {
+      translate: (x: number, y: number) => mul([1, 0, 0, 1, x, y]),
+      scale: (x: number, y: number) => mul([x, 0, 0, y, 0, 0]),
+      rotate: (r: number) => mul([Math.cos(r), Math.sin(r), -Math.sin(r), Math.cos(r), 0, 0]),
+    };
+    const map = (x: number, y: number) => {
+      const [a, b, c, d, e, f] = m as [number, number, number, number, number, number];
+      return [Math.round(a * x + c * y + e), Math.round(b * x + d * y + f)];
+    };
+    return { ctx: ctx as unknown as CanvasRenderingContext2D, map };
+  }
+
+  function topLeftLandsAt(t: ImageTransform, w = 40, h = 30) {
+    const out = rotatedSize({ width: w, height: h }, t.rotate);
+    const { ctx, map } = fakeContext();
+    applyTransform(ctx, t, out, { width: w, height: h });
+    return { out, topLeft: map(0, 0), bottomRight: map(w, h) };
+  }
+
+  it('rotates clockwise into a swapped canvas', () => {
+    expect(topLeftLandsAt({ rotate: 90, flipH: false, flipV: false })).toEqual({ out: { width: 30, height: 40 }, topLeft: [30, 0], bottomRight: [0, 40] });
+    expect(topLeftLandsAt({ rotate: 180, flipH: false, flipV: false }).topLeft).toEqual([40, 30]);
+    expect(topLeftLandsAt({ rotate: 270, flipH: false, flipV: false }).topLeft).toEqual([0, 40]);
+  });
+
+  it('mirrors after rotating, as seen on screen', () => {
+    expect(topLeftLandsAt({ rotate: 0, flipH: true, flipV: false }).topLeft).toEqual([40, 0]);
+    expect(topLeftLandsAt({ rotate: 0, flipH: false, flipV: true }).topLeft).toEqual([0, 30]);
+    // Rotate right puts the top-left at the top-right; mirroring horizontally then brings it back to the left.
+    expect(topLeftLandsAt({ rotate: 90, flipH: true, flipV: false }).topLeft).toEqual([0, 0]);
+  });
+
+  it('describes the same transform in CSS for previews', () => {
+    expect(cssTransform({ rotate: 90, flipH: true, flipV: false })).toBe('scale(-1, 1) rotate(90deg)');
+    expect(isIdentityTransform({ rotate: 0, flipH: false, flipV: false })).toBe(true);
   });
 });

@@ -19,7 +19,7 @@ const meta: ToolMeta = {
   },
   output: ['png', 'svg'],
   // QR images are often printed or resized for a specific layout.
-  relatedToolIds: ['jpg-to-pdf', 'resize-image'],
+  relatedToolIds: ['jpg-to-pdf', 'resize-image', 'password-generator'],
   premiumFeatures: ['premiumUtilities'],
   slugs: { en: 'qr-code-generator', es: 'generador-qr' },
   dateModified: '2026-09-19',

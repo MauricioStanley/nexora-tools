@@ -18,12 +18,15 @@ import { decodeImage } from './decode';
 import { encodeCanvas, type OutputMime } from './encode';
 import { readImageDimensions, readJpegInfo, readWebpInfo } from './headers';
 import { computeTargetSize, fitWithinLimits, type ResizeSpec } from './resize';
+import { applyTransform, isIdentityTransform, rotatedSize, type ImageTransform } from './transform';
 
 export interface ImageProcessOptions {
   mime: OutputMime;
   /** 0..1 for lossy formats. */
   quality: number;
   resize?: ResizeSpec;
+  /** Applied after EXIF orientation; `resize` targets the transformed size. */
+  transform?: ImageTransform;
   /** Fill color for transparent areas when the output has no alpha (JPEG). */
   background?: string;
   signal?: AbortSignal;
@@ -64,6 +67,7 @@ export async function probeImage(file: Blob, type: InputFileTypeId): Promise<Ima
 
 export async function processImage(file: Blob, type: InputFileTypeId, options: ImageProcessOptions): Promise<ImageProcessResult> {
   const { mime, quality, resize = { mode: 'none' }, background = '#ffffff', signal } = options;
+  const transform = options.transform && !isIdentityTransform(options.transform) ? options.transform : null;
 
   const head = await readBytes(file.slice(0, 256 * 1024));
   const raw = readImageDimensions(head, type);
@@ -88,7 +92,8 @@ export async function processImage(file: Blob, type: InputFileTypeId, options: I
       source = oriented;
     }
 
-    const target = computeTargetSize({ width: decoded.width, height: decoded.height }, resize);
+    const shown = rotatedSize({ width: decoded.width, height: decoded.height }, transform?.rotate ?? 0);
+    const target = computeTargetSize(shown, resize);
     const fitted = fitWithinLimits(target, getCanvasLimits());
 
     canvas = createCanvas(fitted.width, fitted.height);
@@ -97,7 +102,15 @@ export async function processImage(file: Blob, type: InputFileTypeId, options: I
       ctx.fillStyle = background;
       ctx.fillRect(0, 0, fitted.width, fitted.height);
     }
-    drawScaled(ctx, source, decoded.width, decoded.height, fitted.width, fitted.height);
+    if (transform) {
+      const draw = rotatedSize(fitted, transform.rotate);
+      ctx.save();
+      applyTransform(ctx, transform, fitted, draw);
+      drawScaled(ctx, source, decoded.width, decoded.height, draw.width, draw.height);
+      ctx.restore();
+    } else {
+      drawScaled(ctx, source, decoded.width, decoded.height, fitted.width, fitted.height);
+    }
     throwIfAborted(signal);
 
     const blob = await encodeCanvas(canvas, mime, quality);

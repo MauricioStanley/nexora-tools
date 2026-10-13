@@ -1,17 +1,18 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { FileToolLayout } from '@/components/tools/FileToolLayout';
-import { Notice } from '@/components/tools/Notice';
 import { NumberField, OptionsStack, Segmented, TextField } from '@/components/tools/options';
 import { createOutput, type OutputFile } from '@/components/tools/output';
+import { PdfProblemNotice } from '@/components/tools/PdfProblemNotice';
 import type { ToolIslandProps } from '@/components/tools/types';
 import { useFileSelection } from '@/components/tools/useFileSelection';
+import { usePageRanges } from '@/components/tools/usePageRanges';
 import { usePdfInspection } from '@/components/tools/usePdfInspection';
 import { useToolRunner } from '@/components/tools/useToolRunner';
 import { fmt, plural } from '@/i18n/format';
 import { ToolFailure } from '@/lib/errors';
 import { bytesToBlob } from '@/lib/files/read';
 import { baseName } from '@/lib/files/sanitize';
-import { parsePageRanges, type RangeParseResult } from '@/lib/pdf/ranges';
+import type { RangeParseResult } from '@/lib/pdf/ranges';
 import type { SplitPdfUi } from './i18n/en';
 import type { SplitMode } from './logic';
 import { runSplit } from './run';
@@ -42,14 +43,9 @@ export default function SplitPdfTool(props: ToolIslandProps<SplitPdfUi>) {
   const text = mode === 'extract' ? extractText : rangesText;
   const needsRanges = mode === 'ranges' || mode === 'extract';
 
-  const parsed = useMemo(() => (needsRanges && pages ? parsePageRanges(text, pages) : null), [needsRanges, pages, text]);
+  const { parsed, error: rangeError } = usePageRanges(text, needsRanges ? pages : null, common.pageRanges);
   const everyValue = typeof every === 'number' && every >= 1 ? Math.floor(every) : 0;
   const outputs = pages ? countOutputs(mode, pages, parsed, everyValue) : 0;
-
-  const rangeError =
-    parsed && !parsed.ok && text.trim() !== ''
-      ? fmt(ui.rangeErrors[parsed.error], { token: parsed.token ?? '', pages: pages ?? 0 })
-      : undefined;
 
   const problem = current?.info.problem;
   const inspecting = Boolean(current?.info.inspecting);
@@ -176,17 +172,7 @@ export default function SplitPdfTool(props: ToolIslandProps<SplitPdfUi>) {
       dropzoneTitle={ui.dropTitle}
       downloadLabel={ui.downloadLabel}
       showComparison={false}
-      notices={
-        problem === 'encrypted_pdf' ? (
-          <Notice tone="error" title={common.errors.encrypted_pdf.title}>
-            <p>{common.errors.encrypted_pdf.message}</p>
-          </Notice>
-        ) : problem ? (
-          <Notice tone="error" title={common.errors.corrupt_pdf.title}>
-            <p>{common.errors.corrupt_pdf.message}</p>
-          </Notice>
-        ) : undefined
-      }
+      notices={<PdfProblemNotice problem={problem} strings={common} />}
     />
   );
 }

@@ -295,6 +295,16 @@ const es: Dictionary = {
       outputFormat: 'Formato de salida',
       sameFormat: 'Igual que el original',
     },
+    pageRanges: {
+      placeholder: 'p. ej. 1-3, 5, 8-10',
+      hint: 'Separa páginas y rangos con comas. “7-” significa de la página 7 al final.',
+      errors: {
+        empty: 'Escribe al menos una página o un rango.',
+        syntax: '“{token}” no es una página ni un rango válido.',
+        out_of_bounds: '“{token}” está fuera de este PDF (1–{pages}).',
+        reversed: '“{token}” va hacia atrás. Escríbelo como a-b con a ≤ b.',
+      },
+    },
     errors: {
       encrypted_pdf: {
         title: 'Este PDF está protegido con contraseña',

@@ -21,12 +21,6 @@ const ui: SplitPdfUi = {
   extractHint: 'Las páginas se añaden en el orden en que las escribes.',
   everyLabel: 'Páginas por archivo',
   preview: { one: 'Genera {count} PDF', other: 'Genera {count} PDF' },
-  rangeErrors: {
-    empty: 'Escribe al menos una página o un rango.',
-    syntax: '“{token}” no es una página ni un rango válido.',
-    out_of_bounds: '“{token}” está fuera de este PDF (1–{pages}).',
-    reversed: '“{token}” va hacia atrás. Escríbelo como a-b con a ≤ b.',
-  },
   inspecting: 'Leyendo tu PDF…',
   protectedHint: 'Este PDF está protegido con contraseña y no se puede dividir.',
   splitting: 'Creando el archivo {current} de {total}…',
@@ -49,7 +43,7 @@ const content: ToolContent<SplitPdfUi> = {
       'Divide un PDF en páginas sueltas o rangos personalizados, o extrae solo las páginas que necesitas. Gratis y privado: tu PDF se procesa en tu navegador, sin subirlo.',
   },
   keywords: ['dividir pdf', 'separar pdf', 'extraer paginas pdf', 'cortar pdf', 'partir pdf', 'separar paginas pdf', 'dividir paginas pdf'],
-  aliases: ['separar hojas pdf', 'sacar paginas de un pdf', 'extraer hojas pdf', 'dividir pdf en paginas', 'quitar paginas pdf'],
+  aliases: ['separar hojas pdf', 'sacar paginas de un pdf', 'extraer hojas pdf', 'dividir pdf en paginas'],
   howTo: [
     { title: 'Añade tu PDF', text: 'Suelta el archivo en la página o elígelo desde tu dispositivo. Verás el número de páginas al instante.' },
     { title: 'Elige cómo dividirlo', text: 'Separa cada página, define rangos como 1-3, 5, 8-10, extrae páginas concretas o corta cada N páginas.' },

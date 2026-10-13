@@ -8,19 +8,28 @@ import { allTools, getRelatedTools, listedTools, validateRegistry } from '@/tool
 const toolsDir = path.resolve(__dirname, '../src/tools');
 
 describe('tool registry', () => {
-  it('registers the 10 V1 tools', () => {
+  it('registers every live tool', () => {
     expect(listedTools.map((t) => t.id).sort()).toEqual(
       [
+        'add-page-numbers',
         'compress-image',
         'compress-pdf',
         'jpg-to-pdf',
+        'jpg-to-png',
         'merge-pdf',
+        'password-generator',
         'pdf-to-jpg',
+        'png-to-jpg',
         'qr-code-generator',
+        'remove-pdf-pages',
         'resize-image',
+        'rotate-image',
+        'rotate-pdf',
         'split-pdf',
         'to-webp',
+        'watermark-pdf',
         'webp-to-jpg',
+        'word-counter',
       ].sort(),
     );
   });

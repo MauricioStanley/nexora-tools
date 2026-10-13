@@ -6,9 +6,10 @@ Privacy is a core product differentiator and it is enforced **by architecture, n
 
 | Data | Leaves the device? | Where it lives | Lifetime |
 | --- | --- | --- | --- |
-| Files selected in any V1 tool | **No** | Browser memory (tab) | Until reset, new run, tab close |
+| Files selected in any tool | **No** | Browser memory (tab) | Until reset, new run, tab close |
 | Processed results | **No** | Browser memory as Blobs + object URLs | Until download/reset/unmount (URLs revoked) |
-| Text typed in the QR generator (incl. Wi-Fi passwords) | **No** | React state in the tab | Until the tab closes |
+| Text typed in the QR generator (incl. Wi-Fi passwords), the word counter or a watermark | **No** | React state in the tab | Until the tab closes |
+| Generated passwords | **No** | React state in the tab (created after load, never in the HTML) | Until regenerated or the tab closes |
 | Preferences (language, theme, dismissed banner, analytics choice) | No | `localStorage` | Until the user clears site data |
 | Recently used tool IDs | No | `localStorage` (IDs only, never file names) | Until cleared |
 | Page requests (IP, user agent) | Yes, as with any website | Cloudflare (hosting/CDN/security) | Per Cloudflare's policies |
@@ -25,7 +26,7 @@ Each tool declares `executionMode` in its `meta.ts`:
 | `server` | Files are uploaded for processing | "Server processing" + details |
 | `external` | A third-party provider is involved | "External service" + details |
 
-**All 10 V1 tools are `client`.** The badge, "Tool details" and copy are generated from this field, so a page cannot display a local-processing claim for a tool that isn't declared `client`. Tests assert every listed V1 tool is `client`.
+**All 19 tools are `client`.** The badge, "Tool details" and copy are generated from this field, so a page cannot display a local-processing claim for a tool that isn't declared `client`. Tests assert every listed V1 tool is `client`.
 
 ## 3. Client-side processing lifecycle
 

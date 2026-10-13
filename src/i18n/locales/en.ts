@@ -298,6 +298,16 @@ const en = {
       outputFormat: 'Output format',
       sameFormat: 'Same as original',
     },
+    pageRanges: {
+      placeholder: 'e.g. 1-3, 5, 8-10',
+      hint: 'Separate pages and ranges with commas. “7-” means page 7 to the end.',
+      errors: {
+        empty: 'Enter at least one page or range.',
+        syntax: '“{token}” isn’t a valid page or range.',
+        out_of_bounds: '“{token}” is outside this PDF (1–{pages}).',
+        reversed: '“{token}” goes backwards. Write it as a-b with a ≤ b.',
+      },
+    },
     errors: {
       encrypted_pdf: {
         title: 'This PDF is password-protected',

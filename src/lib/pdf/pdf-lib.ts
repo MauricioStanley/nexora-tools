@@ -18,5 +18,8 @@ export {
   PDFStream,
   PDFContext,
   EncryptedPDFError,
+  StandardFonts,
   degrees,
+  rgb,
 } from 'pdf-lib';
+export type { PDFFont, PDFPage } from 'pdf-lib';

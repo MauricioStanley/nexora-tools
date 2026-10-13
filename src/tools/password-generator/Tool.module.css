@@ -1,0 +1,86 @@
+.layout {
+  display: grid;
+  gap: var(--space-5);
+}
+
+@media (min-width: 860px) {
+  .layout {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    align-items: start;
+  }
+}
+
+.result {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.password {
+  display: block;
+  min-height: 3.5rem;
+  padding: var(--space-4);
+  overflow-wrap: anywhere;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-inset);
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: var(--text-xl);
+  line-height: var(--leading-snug);
+  user-select: all;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.strength {
+  display: grid;
+  gap: var(--space-2);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.strength p {
+  margin: 0;
+}
+
+.strength strong {
+  color: var(--color-text);
+}
+
+.meter {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-1);
+}
+
+.meter span {
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-3);
+}
+
+.strength[data-level='1'] .meter span:nth-child(-n + 1) {
+  background: var(--color-error);
+}
+
+.strength[data-level='2'] .meter span:nth-child(-n + 2) {
+  background: var(--color-warning);
+}
+
+.strength[data-level='3'] .meter span:nth-child(-n + 3),
+.strength[data-level='4'] .meter span {
+  background: var(--color-success);
+}
+
+.note {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: var(--space-5) 0 0;
+  color: var(--color-text-subtle);
+  font-size: var(--text-sm);
+}

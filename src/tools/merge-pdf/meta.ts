@@ -19,7 +19,7 @@ const meta: ToolMeta = {
     maxTotalSizeMB: 400,
   },
   output: ['pdf'],
-  relatedToolIds: ['compress-pdf', 'split-pdf', 'jpg-to-pdf'],
+  relatedToolIds: ['compress-pdf', 'split-pdf', 'jpg-to-pdf', 'add-page-numbers'],
   premiumFeatures: ['largerFiles', 'batchProcessing'],
   slugs: { en: 'merge-pdf', es: 'unir-pdf' },
   dateModified: '2026-09-18',

@@ -18,7 +18,7 @@ const meta: ToolMeta = {
     maxFileSizeMB: 200,
   },
   output: ['pdf', 'zip'],
-  relatedToolIds: ['merge-pdf', 'compress-pdf', 'pdf-to-jpg'],
+  relatedToolIds: ['merge-pdf', 'compress-pdf', 'pdf-to-jpg', 'remove-pdf-pages'],
   premiumFeatures: ['largerFiles'],
   slugs: { en: 'split-pdf', es: 'dividir-pdf' },
   dateModified: '2026-09-18',

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { absoluteUrl, alternatesFor, getAllRoutes, pathFor } from '@/lib/routing';
+import { listedTools } from '@/tools/registry';
 
 describe('localized routing', () => {
   it('builds the documented tool URLs', () => {
@@ -32,8 +33,8 @@ describe('localized routing', () => {
     for (const p of paths) {
       expect(p).toMatch(/^\/(en|es)\/([a-z0-9-]+\/)*$/);
     }
-    // home, directory, 3 categories, 10 tools, 4 pages, 404 — in 2 locales
-    expect(routes).toHaveLength((1 + 1 + 3 + 10 + 4 + 1) * 2);
+    // home, directory, 3 categories, every listed tool, 4 pages, 404 — in 2 locales
+    expect(routes).toHaveLength((1 + 1 + 3 + listedTools.length + 4 + 1) * 2);
     expect(routes.filter((r) => !r.indexable).every((r) => r.key.kind === 'not-found')).toBe(true);
   });
 

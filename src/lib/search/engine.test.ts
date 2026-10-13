@@ -31,6 +31,16 @@ describe('search engine', () => {
     ['split', 'split-pdf'],
     ['reduce pdf size', 'compress-pdf'],
     ['wifi qr', 'qr-code-generator'],
+    ['rotate pdf', 'rotate-pdf'],
+    ['delete pdf pages', 'remove-pdf-pages'],
+    ['page numbers', 'add-page-numbers'],
+    ['watermark', 'watermark-pdf'],
+    ['png to jpg', 'png-to-jpg'],
+    ['jpg to png', 'jpg-to-png'],
+    ['flip image', 'rotate-image'],
+    ['password', 'password-generator'],
+    ['word count', 'word-counter'],
+    ['character counter', 'word-counter'],
   ])('en: "%s" → %s', (query, expected) => {
     expect(top(en, query)).toBe(expected);
   });
@@ -44,6 +54,14 @@ describe('search engine', () => {
     ['código qr', 'qr-code-generator'],
     ['merge pdf', 'merge-pdf'],
     ['pdf a jpg', 'pdf-to-jpg'],
+    ['rotar pdf', 'rotate-pdf'],
+    ['eliminar paginas pdf', 'remove-pdf-pages'],
+    ['numerar paginas', 'add-page-numbers'],
+    ['marca de agua', 'watermark-pdf'],
+    ['png a jpg', 'png-to-jpg'],
+    ['girar foto', 'rotate-image'],
+    ['generador de contraseñas', 'password-generator'],
+    ['contar palabras', 'word-counter'],
   ])('es: "%s" → %s', (query, expected) => {
     expect(top(es, query)).toBe(expected);
   });

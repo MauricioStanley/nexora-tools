@@ -20,12 +20,6 @@ const ui = {
   extractHint: 'Pages are added in the order you type them.',
   everyLabel: 'Pages per file',
   preview: { one: 'Creates {count} PDF', other: 'Creates {count} PDFs' },
-  rangeErrors: {
-    empty: 'Enter at least one page or range.',
-    syntax: '“{token}” isn’t a valid page or range.',
-    out_of_bounds: '“{token}” is outside this PDF (1–{pages}).',
-    reversed: '“{token}” goes backwards. Write it as a-b with a ≤ b.',
-  },
   inspecting: 'Reading your PDF…',
   protectedHint: 'This PDF is password-protected and can’t be split.',
   splitting: 'Creating file {current} of {total}…',
@@ -50,7 +44,7 @@ const content: ToolContent<SplitPdfUi> = {
       'Split a PDF into single pages or custom ranges, or extract only the pages you need. Free and private: your PDF is processed in your browser, never uploaded.',
   },
   keywords: ['split pdf', 'extract pdf pages', 'separate pdf', 'pdf splitter', 'split pdf pages', 'cut pdf', 'divide pdf'],
-  aliases: ['separate pdf pages', 'extract pages from pdf', 'pdf page extractor', 'break pdf apart', 'split pdf into pages', 'remove pages pdf'],
+  aliases: ['separate pdf pages', 'extract pages from pdf', 'pdf page extractor', 'break pdf apart', 'split pdf into pages'],
   howTo: [
     { title: 'Add your PDF', text: 'Drop the file onto the page or choose it from your device. The page count appears right away.' },
     { title: 'Choose how to split', text: 'Split every page, define ranges like 1-3, 5, 8-10, extract selected pages, or cut every N pages.' },

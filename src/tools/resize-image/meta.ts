@@ -20,7 +20,7 @@ const meta: ToolMeta = {
     allowPaste: true,
   },
   output: ['jpeg', 'png', 'webp', 'zip'],
-  relatedToolIds: ['compress-image', 'to-webp', 'jpg-to-pdf'],
+  relatedToolIds: ['compress-image', 'to-webp', 'jpg-to-pdf', 'rotate-image'],
   premiumFeatures: ['largerFiles', 'batchProcessing'],
   slugs: { en: 'resize-image', es: 'redimensionar-imagen' },
   dateModified: '2026-09-19',
