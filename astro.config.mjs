@@ -10,8 +10,22 @@ import { localized404 } from './integrations/localized-404.mjs';
  */
 const env = loadEnv(process.env.NODE_ENV ?? 'production', process.cwd(), '');
 
-/** Canonical production origin. Override only for staging builds that must self-reference. */
-const SITE = (env.PUBLIC_SITE_URL || 'https://nexora-tools.stanleycedillos1.workers.dev').replace(/\/+$/, '');
+/**
+ * Canonical production origin. PUBLIC_SITE_URL is typed by hand in hosting dashboards, so a
+ * missing scheme or stray quotes are fixed instead of failing the build with "Invalid URL".
+ * @param {string | undefined} value
+ */
+function siteUrl(value) {
+  const raw = (value || 'https://nexora-tools.stanleycedillos1.workers.dev').trim().replace(/^["']|["']$/g, '');
+  const withScheme = /^[a-z][a-z\d+.-]*:\/\//i.test(raw) ? raw : `https://${raw}`;
+  try {
+    return new URL(withScheme).href.replace(/\/+$/, '');
+  } catch {
+    throw new Error(`PUBLIC_SITE_URL must be a URL like https://example.com, got "${value}".`);
+  }
+}
+
+const SITE = siteUrl(env.PUBLIC_SITE_URL);
 const GA4_ID = (env.PUBLIC_GA4_ID || '').trim();
 
 /**

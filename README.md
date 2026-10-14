@@ -43,7 +43,7 @@ All 19 tools are `executionMode: 'client'`: no file or text data leaves the devi
 
 ## Requirements
 
-- Node.js **≥ 22.12** (`.node-version` pins 22.12.0)
+- Node.js **≥ 22.19** (`.node-version` pins 22.23.2, preinstalled in the Cloudflare build image)
 - npm ≥ 10
 
 ## Getting started

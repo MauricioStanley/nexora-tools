@@ -10,7 +10,7 @@ Nexora Tools is a fully static site. Any static host works, but it is designed f
 | Build command | `npm run build` |
 | Output directory | `dist` |
 | Root directory | `/` (repository root) |
-| Node.js version | `22.12.0` or newer (read from `.node-version`; or set `NODE_VERSION=22.12.0`) |
+| Node.js version | `22.23.2` (read from `.node-version`; or set `NODE_VERSION=22.23.2`) |
 | Install command | `npm ci` (default: `npm install`) |
 
 `npm run build` runs `prebuild` first, which copies PDF.js runtime assets into `public/vendor/pdfjs/` (a git-ignored, generated folder).
@@ -31,7 +31,7 @@ Set these in **Pages → Settings → Environment variables** (Production and, i
 | `PUBLIC_SITE_URL` | *(unset)* → `https://nexora-tools.stanleycedillos1.workers.dev` | *(unset)* | Canonicals always point to production; previews are `noindex` via `_headers`. |
 | `PUBLIC_GA4_ID` | `G-XXXXXXX` when analytics is approved | *(unset)* | Empty = no analytics code at all. The CSP whitelists Google hosts only when this is set. |
 | `PUBLIC_GSC_VERIFICATION` | optional | *(unset)* | Prefer DNS verification. |
-| `NODE_VERSION` | `22.12.0` | `22.12.0` | Only if `.node-version` isn't picked up. |
+| `NODE_VERSION` | `22.23.2` | `22.23.2` | Only if `.node-version` isn't picked up. |
 
 No secrets exist in V1.
 
